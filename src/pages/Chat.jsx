@@ -16,6 +16,7 @@ import { useVoiceRecorder } from "../lib/audio";
 import { currentEmail, logout } from "../lib/auth";
 import { callsMark, detectMood, isTicketNews, reactToUser, stripStageDirections } from "../lib/mood";
 import RoamingRobot from "../components/RoamingRobot";
+import { useServerUp } from "../lib/useServerUp";
 import {
   loadConversations,
   loadAgent,
@@ -52,6 +53,7 @@ function greetingMessage() {
 }
 
 function Chat() {
+  const serverUp = useServerUp("/api/v1/helpdesk/health"); // Mark is only here while the backend is running
   const { conversationId } = useParams();
   const navigate = useNavigate();
 
@@ -458,7 +460,7 @@ function Chat() {
 
         {/* Mark floats above the page: he turns up from a random edge, stands somewhere for a while and
             leaves again. He takes no space, so the chat always keeps its full width. */}
-        <RoamingRobot
+        {serverUp && <RoamingRobot
           baseMood={robotMood}
           wakeKey={activity}
           hold={sending || speakingId !== null}
@@ -466,7 +468,7 @@ function Chat() {
           reaction={reaction}
           dismissed={robotDismissed}
           onDismiss={() => setRobotDismissed(true)}
-        />
+        />}
 
         {/* chat area */}
         {/* takes the space left between the header and the composer, so a tall composer (the interview panel) never pushes the message box off screen */}

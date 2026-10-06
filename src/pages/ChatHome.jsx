@@ -2,9 +2,11 @@ import React from "react";
 import { Button } from "../components/ui/button";
 import RoamingRobot from "../components/RoamingRobot";
 import { useNavigate } from "react-router-dom";
+import { useServerUp } from "../lib/useServerUp";
 
 function ChatHome() {
   const navigate = useNavigate();
+  const serverUp = useServerUp("/api/v1/helpdesk/health"); // no server, no Mark
 
   const handleStartClick = () => {
     navigate("/chat/new");
@@ -13,7 +15,7 @@ function ChatHome() {
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col justify-center items-center gap-6">
       {/* Mark turns up from a random edge of the screen, cheers, and wanders off again later */}
-      <RoamingRobot baseMood="happy" stayFor={8000} />
+      {serverUp && <RoamingRobot baseMood="happy" stayFor={8000} />}
 
       <h1 className="text-4xl font-bold">
         Welcome to Help Desk System
