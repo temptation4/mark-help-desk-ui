@@ -4,17 +4,22 @@ A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives 
 
 > The UI is open source (this repo). The backend it talks to (login service, AI agents, tools) is a separate **private** repo; this README explains how it works so you can see the whole picture.
 
+## ▶ Try Mark live
+
+### **[temptation4.github.io/mark-help-desk-ui](https://temptation4.github.io/mark-help-desk-ui/)**
+
+Sign in with any email and password and say hello. It runs entirely in your browser with no backend, so it is a **demo mode**:
+
+- **Real:** Mark himself. His reactions, the dragging and the corner bin all work. Try *"i want pizza"*, *"dance for me"*, *"thank you"*, *"you are so cute"* or *"do some magic"*.
+- **Canned:** the login and the answers of the three agents (the real ones need the Java backend and local AI models). Voice, file upload and the laptop/file tools are switched off.
+
+To see the agents doing real work (checking a laptop, reading and saving files), watch the video below. To run the demo yourself: `npm run build:demo` (output in `dist/`) or `VITE_DEMO=true npm run dev`.
+
+### Watch the full demo video
+
 [![Watch the demo](docs/media/poster.png)](docs/media/mark-demo.mp4)
 
 *Click the picture to play the full demo (about 2.5 minutes). Everything in it is recorded from the real app, nothing is mocked.*
-
-## Try Mark in your browser
-
-**https://temptation4.github.io/mark-help-desk-ui/** (sign in with any email and password)
-
-The hosted version is a **demo mode**: it runs entirely in your browser with no backend. Mark is the real thing, so his reactions, the dragging and the corner bin all work; type *"i want pizza"*, *"dance for me"* or *"thank you"* and watch him. What is canned: the login and the answers of the agents (the real ones need the Java backend and local AI models), and voice, file upload and the laptop/file tools are switched off.
-
-Run the demo yourself with `npm run build:demo` (output in `dist/`), or `VITE_DEMO=true npm run dev`.
 
 ## Talking to Mark is fun
 
