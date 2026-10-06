@@ -6,6 +6,7 @@ import { Input } from "../components/ui/input";
 import { Card, CardContent } from "../components/ui/card";
 import { Spinner } from "../components/ui/spinner";
 import { isLoggedIn } from "../lib/auth";
+import { DEMO } from "../lib/demo";
 import { login, register } from "../services/auth.service";
 
 /** One page for both "Sign in" and "Create account"; a link underneath switches between them. */
@@ -51,6 +52,7 @@ function Login() {
       {/* happy to see you, and sad when the sign-in is refused */}
       <MoodAvatar mood={error ? "sad" : "happy"} size={140} />
       <h1 className="text-3xl font-bold">Help Desk System</h1>
+      {DEMO && <p className="-mt-3 text-sm text-muted-foreground">This is a demo: sign in with any email and password.</p>}
 
       <Card className="w-full max-w-sm">
         <CardContent>

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { authHeaders, handleUnauthorized } from "../lib/auth";
+import { DEMO } from "../lib/demo";
 
 const client = axios.create({
   baseURL: "/api",
@@ -27,6 +28,7 @@ client.interceptors.response.use(
  * `signal` lets the caller abort mid-request (e.g. the user hits Cancel).
  */
 export async function transcribeAudio(wavBlob, signal) {
+  if (DEMO) throw new Error("Voice needs the real backend (speech models): it is switched off in the demo.");
   const form = new FormData();
   form.append("audio", wavBlob, "voice-message.wav");
 
@@ -40,6 +42,7 @@ export async function transcribeAudio(wavBlob, signal) {
  * the caller is responsible for revoking it once playback is done.
  */
 export async function synthesizeSpeech(text) {
+  if (DEMO) throw new Error("Voice needs the real backend (speech models): it is switched off in the demo.");
   const response = await client.post("/v1/helpdesk/voice/text-to-speech", text, {
     headers: { "Content-Type": "text/plain" },
     responseType: "blob",

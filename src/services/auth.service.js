@@ -1,4 +1,5 @@
 import { saveSession } from "../lib/auth";
+import { DEMO, demoSession } from "../lib/demo";
 
 /**
  * POST /api/v1/auth/login or /register. Both return { token, email, expiresAt } on success and
@@ -6,6 +7,12 @@ import { saveSession } from "../lib/auth";
  * On success the session is saved, so the caller only has to navigate away.
  */
 async function authenticate(action, email, password) {
+  if (DEMO) { // hosted demo: any email and password gets in
+    const session = demoSession(email);
+    saveSession(session);
+    return session;
+  }
+
   const response = await fetch(`/api/v1/auth/${action}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

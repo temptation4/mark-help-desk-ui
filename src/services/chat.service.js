@@ -1,4 +1,5 @@
 import { authHeaders, handleUnauthorized } from "../lib/auth";
+import { DEMO, streamDemoReply } from "../lib/demo";
 
 /**
  * POST /api/v1/helpdesk/stream - the backend takes the message as a raw text body
@@ -18,6 +19,8 @@ import { authHeaders, handleUnauthorized } from "../lib/auth";
  * (the support agent that can look up and open tickets). It travels in the Agent header.
  */
 export async function streamMessagesToServer(message, conversationId, onChunk, agent = "chat") {
+  if (DEMO) return streamDemoReply(message, agent, onChunk); // hosted demo: canned answers, no backend
+
   const response = await fetch("/api/v1/helpdesk/stream", {
     method: "POST",
     headers: {

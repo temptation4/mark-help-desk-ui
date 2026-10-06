@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { DEMO } from "./demo";
 
 // Is the server behind `path` running? Mark only shows up while it is: a robot that cheerfully offers help when nothing can
 // answer would be a lie. A network error or a 502/503/504 (what the dev proxy or a gateway sends when the server is down)
@@ -6,9 +7,10 @@ import { useEffect, useState } from "react";
 const DOWN = [502, 503, 504];
 
 export function useServerUp(path) {
-  const [up, setUp] = useState(false); // not shown until the first check says yes
+  const [up, setUp] = useState(DEMO); // not shown until the first check says yes (the hosted demo has no backend and is always "up")
 
   useEffect(() => {
+    if (DEMO) return undefined;
     let stopped = false;
     let timer;
     const check = async () => {

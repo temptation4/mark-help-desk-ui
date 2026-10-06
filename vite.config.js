@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 export default defineConfig({
+  // the hosted demo (npm run build:demo) uses relative asset paths, so it works under any GitHub Pages address
+  base: process.env.VITE_DEMO === 'true' ? './' : '/',
   plugins: [
     react(),
     tailwindcss(),

@@ -1,3 +1,5 @@
+import { loginPath } from "./demo";
+
 // The logged-in user's session, kept in localStorage so a page refresh doesn't log them out.
 //
 // What is stored: { token, email, expiresAt } - exactly what POST /api/v1/auth/login returns.
@@ -48,5 +50,5 @@ export function authHeaders() {
  */
 export function handleUnauthorized() {
   logout();
-  window.location.assign("/login");
+  window.location.assign(loginPath());
 }

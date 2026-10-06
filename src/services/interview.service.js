@@ -1,4 +1,5 @@
 import { authHeaders, handleUnauthorized } from "../lib/auth";
+import { DEMO } from "../lib/demo";
 
 /**
  * POST /api/v1/interview/files - uploads a file for Mark to read. `kind` is "resume", "job" (a job description) or
@@ -7,6 +8,7 @@ import { authHeaders, handleUnauthorized } from "../lib/auth";
  * Resolves with {fileName, savedAs, characters, note}; throws an Error whose message can be shown to the user.
  */
 export async function uploadInterviewFile(file, kind) {
+  if (DEMO) throw new Error("Uploads need the real backend: this demo cannot read or save files.");
   const form = new FormData();
   form.append("kind", kind);
   form.append("file", file);
