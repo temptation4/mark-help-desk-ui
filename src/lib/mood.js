@@ -140,7 +140,7 @@ const USER_RULES = [
   { test: /\b(fixed|solved|resolved|works now|working now|working again|it works|all good|all sorted|sorted out|problem gone)\b|🎉/i, gesture: "happy" },
   { test: /\b(urgent|asap|emergency|frustrat\w*|angry|furious|annoy\w*|irritat\w*|terrible|awful|worst|hate|useless|stuck|can'?t|cannot|unable|lost my|losing my|deadline|help me|please help)\b|😡|😤|😢|😭|😞/i, gesture: "sad" },
   // the user is not well or sad: he shows he cares ("i am feeling bad")
-  { test: /\b(feel(ing)? (bad|sick|unwell|down|sad|low|awful|terrible|lonely|depressed|tired|stressed)|not (feeling )?(well|good|great|okay|ok)|unwell|depress\w*|lonely|heartbroken|stressed|scared|afraid|frightened|worried|anxious|nervous)\b/i, gesture: "sad" },
+  { test: /\b(feel(ing)? (bad|sick|unwell|down|sad|low|awful|terrible|lonely|depressed|tired|stressed)|not (feeling )?(well|good|great|okay|ok)|unwell|depress\w*|lonely|heartbroken|stressed|scared|afraid|frightened|worried|anxious|nervous|tension|tense|stress|anxiety|panic\w*|overwhelmed|burnt out|burnout)\b/i, gesture: "sad" },
   { test: /\b(namaste|namastey|namaskar|namaskaram|pranam|ram ram|radhe radhe|vanakkam|sat sri akal)\b|🙏/i, gesture: "namaste" }, // palms together, with नमस्ते on the visor
   { test: /^\s*(hi|hello|hey|hii+|hola|yo|good (morning|afternoon|evening))\b/i, gesture: "wave" }, // after the problem rules: "Hi, my printer is broken" is a problem first,
 ];

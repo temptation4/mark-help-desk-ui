@@ -593,10 +593,10 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       // typing at the laptop: head tipped down at the screen, both hands tapping away
       const tap = Math.sin(t * 14);
       target.headX = 0.28 + Math.sin(t * 1.3) * 0.03; // head tipped down at the screen
-      target.armRx = -1.0 + tap * 0.12;
-      target.armLx = -1.0 - tap * 0.12;
-      target.armRz = 0.2;
-      target.armLz = -0.2;
+      target.armRx = -0.85 + tap * 0.1; // both hands down on the keyboard, in towards the middle, behind the lid
+      target.armLx = -0.85 - tap * 0.1;
+      target.armRz = -0.45;
+      target.armLz = 0.45;
       target.lean = 0.04;
       target.props = 1;
     } else if (m === "meeting") {

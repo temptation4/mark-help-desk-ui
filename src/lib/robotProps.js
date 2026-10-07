@@ -593,8 +593,8 @@ function laptopKeyboard() {
 }
 
 /**
- * His desk for "working": a wooden desk in front of him with an open laptop (a thin aluminium body, a black bezel with a webcam, a real-looking
- * screen that faces us; he types on the keyboard from behind it), a mouse, a mug of coffee and a little plant. The screen throws a soft blue light
+ * His desk for "working": a wooden desk in front of him with an open laptop (a thin aluminium body with a logo on the back of the lid; the black bezel,
+ * webcam and real-looking screen face him, and he types on the keyboard), a mouse, a mug of coffee and a little plant. The screen throws a soft blue light
  * on him. It stands on the floor in front of him, so it hides his legs.
  */
 function deskWithLaptop(glowTexture) {
@@ -605,15 +605,17 @@ function deskWithLaptop(glowTexture) {
   [-1, 1].forEach((side) => part(g, new THREE.BoxGeometry(0.09, 0.83, 0.85), darkWood, side * 1.15, 0.415, 0)); // the sides
   part(g, new THREE.BoxGeometry(2.3, 0.55, 0.04), darkWood, 0, 0.55, -0.4); // the back panel
   // the laptop: aluminium base with the keyboard on top, a hinge, and the screen standing at the far (camera) side
-  const aluminium = new THREE.MeshStandardMaterial({ color: 0xd5dae2, metalness: 0.75, roughness: 0.3 });
+  const aluminium = new THREE.MeshStandardMaterial({ color: 0x9aa4b3, metalness: 0.6, roughness: 0.35 }); // space grey, so the lid stands out against his white body
   part(g, new THREE.BoxGeometry(1.0, 0.035, 0.68), aluminium, 0, 0.92, -0.02);
   const keys = part(g, new THREE.PlaneGeometry(0.98, 0.66), new THREE.MeshStandardMaterial({ map: laptopKeyboard(), roughness: 0.5 }), 0, 0.9385, -0.02);
   keys.rotation.x = -PI / 2;
   part(g, new THREE.CylinderGeometry(0.018, 0.018, 0.9, 12), new THREE.MeshStandardMaterial({ color: 0x9aa3b2, metalness: 0.8, roughness: 0.3 }), 0, 0.945, 0.32).rotation.z = PI / 2; // the hinge
   const screen = new THREE.Group();
   screen.position.set(0, 0.945, 0.32);
-  screen.rotation.x = -0.2; // leans back a little
+  screen.rotation.set(-0.2, PI, 0); // the screen faces him (turned round, leaning back a little), so we see the back of the lid
   part(screen, new THREE.BoxGeometry(1.0, 0.66, 0.025), aluminium, 0, 0.33, -0.006); // the lid
+  const logo = part(screen, new THREE.CircleGeometry(0.07, 24), new THREE.MeshBasicMaterial({ color: 0xf1f5f9, toneMapped: false }), 0, 0.33, -0.0195); // a glowing logo on the back of the lid, which is what we see
+  logo.rotation.y = PI;
   part(screen, new THREE.BoxGeometry(0.97, 0.63, 0.012), new THREE.MeshStandardMaterial({ color: 0x0a0a0f, roughness: 0.2 }), 0, 0.33, 0.01); // the black bezel
   const screens = [laptopScreen(true), laptopScreen(false)];
   const display = part(screen, new THREE.PlaneGeometry(0.9, 0.5625), new THREE.MeshBasicMaterial({ map: screens[0], toneMapped: false }), 0, 0.325, 0.0175);
