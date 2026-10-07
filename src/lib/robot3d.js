@@ -626,10 +626,10 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       // eating: lifts the food up to his face, takes a bite and chews; the other hand rests under it
       const { bump, chewing } = foodCycle(seconds);
       const drinking = DRINKS.includes(m);
-      const lift = -1.1 - (drinking ? 0.95 : 0.55) * bump; // a sip brings the cup right up to his face
-      if (drinking) { // a hot drink is held in his left hand
+      const lift = -1.1 - (drinking ? 0.6 : 0.55) * bump; // a sip brings the cup right up to his mouth
+      if (drinking) { // a hot drink is held in his left hand, brought in towards the middle of his face
         target.armLx = lift;
-        target.armLz = 0.45;
+        target.armLz = 0.45 + 0.3 * bump;
         target.armRx = -0.5;
         target.armRz = -0.15;
       } else { // food is eaten with his right hand

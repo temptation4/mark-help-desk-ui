@@ -1009,7 +1009,12 @@ export function createProps(scene, arms, glowTexture, head) {
         if (keepUpright) hand.rotation.set(-arms[handIndex].rotation.x, 0, -arms[handIndex].rotation.z);
         else hand.rotation.set(0, 0, 0);
         // sipping: the cup tips its rim towards his face while the hand is raised
-        if (DRINKS.includes(prop.userData.kind)) hand.rotation.x += 0.8 * sip;
+        if (DRINKS.includes(prop.userData.kind)) { // the mug tips with its rim towards his mouth (away from us) and in towards the middle of his face
+          hand.rotation.x -= 0.65 * sip;
+          hand.rotation.z -= 0.5 * sip;
+          // his arm cannot reach round the front of his head, so the mug also slides forward and in: it ends up in front of his mouth, where we can see it
+          prop.position.set(0.2 * sip, -0.12 * sip, 0.6 * sip);
+        }
       });
 
       // hot food steams, and the sparkling drink fizzes
