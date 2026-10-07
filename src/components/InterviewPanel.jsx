@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { FileSearch, FilePlus2, FolderGit2, Upload } from "lucide-react";
 import { Button } from "./ui/button";
 import { uploadInterviewFile } from "../services/interview.service";
+import JobsPanel from "./JobsPanel";
 
 // The buttons only type a message for you: the interview agent does the work with the file tools of the MCP file server.
 const TOPICS = ["Java", "Spring Boot", "Kafka", "System design", "Behavioural"];
@@ -94,6 +95,8 @@ function InterviewPanel({ onSend, busy }) {
           </span>
         )}
       </div>
+
+      <JobsPanel onSend={onSend} busy={busy} />
     </div>
   );
 }

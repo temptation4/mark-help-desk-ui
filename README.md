@@ -61,7 +61,7 @@ Mark is the face. Behind the chat there are three **agents**, each a different p
 |---|---|---|
 | **Chat** | Friendly conversation and general questions | Nothing but the model |
 | **Troubleshoot** | "My wifi keeps disconnecting", "my laptop is slow" | Ticket tools (look up, create and update support tickets) and 13 **laptop check tools** through an MCP server: Wi-Fi status, connected network, internet, DNS, ping, a full Wi-Fi diagnosis, CPU, memory, disk, uptime and top processes. It runs a check first, tells you what it found, and opens a ticket only if the problem is still there. |
-| **Interview prep** | Review your resume, write one, practise a mock interview, write and save sample code projects | Real **file tools** through an MCP server (list, search, read and write files in one allowed folder). It can read your resume, save a new one, and save a code project for you. You can also upload a resume or job description. |
+| **Interview prep** | Review your resume, write one, practise a mock interview, write and save sample code projects | Real **file tools** through an MCP server (list, search, read and write files in one allowed folder). It can read your resume, save a new one, and save a code project for you. You can also upload a resume or job description. It can also help with a **job search** (see below). |
 
 ### Troubleshoot agent: checks your real laptop
 
@@ -76,6 +76,17 @@ Mark called the `checkWifiStatus` tool on the machine the backend runs on, and t
 | ![interview resume](docs/media/14-interview-resume.gif) | ![interview code](docs/media/15-interview-code.gif) |
 
 He searched the allowed folder, read the resume with `read_file`, and gave feedback. Then he created a folder and saved the Java file with `write_file`. The "Tools the model called" list is added by the backend, so you can always see what the model really did.
+
+### Job search inside the Interview agent
+
+The Interview agent can find real jobs, match them to your profile and prepare applications, through a separate MCP server (the job agent) that is protected with **OAuth2** (client credentials). In the UI this is the **Jobs** row of the Interview panel: the job sources and whether each is connected, quick buttons, and your **Applications**.
+
+- **Real listings** come from official job APIs (Arbeitnow and Remotive need no key; Adzuna, with your own free key, covers India). **Naukri has no public API**, so Mark only gives you a Naukri search link to open and sign in to yourself: the agent never asks for a Naukri password, logs in or scrapes.
+- **Matching** is a calculated 0-100 score with matched and missing skills, not a guess.
+- **Nothing is ever sent for you.** Mark prepares a *draft* cover note from your profile. **You** read it and press **Approve** (the AI has no way to), then **Open apply page** takes you to the job's own site where you submit it, and **I applied** records it.
+- The AI is checked: a job link that no tool returned, or a cover letter it wrote itself instead of saving a draft, is thrown away and asked again.
+
+The hosted demo has a made-up draft so you can try the Approve and apply buttons.
 
 ### How the backend fits together
 
