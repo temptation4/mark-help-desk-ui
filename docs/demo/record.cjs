@@ -95,13 +95,15 @@ async function connect() {
     c.textContent = ${JSON.stringify(text)}; return true; })()`);
 
   // ---- log in (not recorded), then start the screencast
-  await send("Page.navigate", { url: URL + "/login" });
-  await sleep(2500);
-  await evaluate(`document.querySelector('input[type="email"], input[placeholder*="example"]').focus(); true`);
-  await type("demo@example.test", 15);
-  await evaluate(`document.querySelector('input[type="password"]').focus(); true`);
-  await type("demo-pass-1234", 15); await enter();
-  await sleep(3000);
+  if (process.env.PART !== "new") {
+    await send("Page.navigate", { url: URL + "/login" });
+    await sleep(2500);
+    await evaluate(`document.querySelector('input[type="email"], input[placeholder*="example"]').focus(); true`);
+    await type("demo@example.test", 15);
+    await evaluate(`document.querySelector('input[type="password"]').focus(); true`);
+    await type("demo-pass-1234", 15); await enter();
+    await sleep(3000);
+  }
 
   const frames = []; // { file, t }
   let n = 0;
@@ -114,7 +116,7 @@ async function connect() {
   });
 
   // new chat
-  await send("Page.navigate", { url: URL + "/chat/new" });
+  await send("Page.navigate", { url: URL + (process.env.PART === "new" ? "/#/login" : "/chat/new") });
   await sleep(1200);
   await send("Page.startScreencast", { format: "jpeg", quality: 82, maxWidth: W, maxHeight: H, everyNthFrame: 1 });
 
@@ -127,7 +129,36 @@ async function connect() {
     console.log("scene done:", name);
   };
 
-if (process.env.PART === "agents") {
+if (process.env.PART === "new") {
+  const clickText = async (selector, text) => {
+    const r = await evaluate(`(() => { const el = [...document.querySelectorAll(${JSON.stringify(selector)})].find(e => e.textContent.trim().startsWith(${JSON.stringify(text)}));
+      if (!el) return null; const b = el.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; })()`);
+    if (!r) throw new Error("no element: " + text);
+    await click(r.x, r.y);
+  };
+  await scene("16-google", "Sign in with Google (OAuth2), or with email and password", async () => {
+    await sleep(2500);
+    await clickText("button", "Continue with Google"); await sleep(3500);
+    await send("Page.navigate", { url: URL + "/#/chat/new" }); await sleep(2500);
+  });
+  await scene("17-movie", "Movie night? Popcorn", async () => { await say("movie night tonight!"); await sleep(8000); });
+  await scene("18-party", "Party time: drinks, sparkles and fireworks", async () => { await say("let's celebrate, party time!"); await sleep(8000); });
+  await scene("19-wedding", "A wedding: bouquet and crown", async () => { await say("my sister's wedding is tomorrow"); await sleep(8000); });
+  await scene("20-love", "Say you love him: flowers for you", async () => { await say("i love you mark"); await sleep(8000); });
+  await scene("21-office", "Working late: he sits at his laptop", async () => { await say("working late at the office today"); await sleep(8500); });
+  await scene("22-coffee", "Coffee break", async () => { await say("i need my morning coffee"); await sleep(8500); });
+  await scene("23-heartbreak", "A breakup: he has a broken heart", async () => { await say("we had a breakup today"); await sleep(8000); });
+  await scene("24-jobs", "Interview agent + Jobs: you approve, then apply on the job site yourself", async () => {
+    await send("Page.navigate", { url: URL + "/#/chat/new" }); await sleep(2500);
+    await caption("Interview agent + Jobs: you approve, then apply on the job site yourself");
+    await clickText("button", "Select agent"); await sleep(800);
+    await clickText('[role="menuitemradio"]', "Interview prep"); await sleep(1800);
+    await clickText("button", "Find jobs for me"); await sleep(5500);
+    await clickText("button", "Applications"); await sleep(2000);
+    await clickText("button", "Approve"); await sleep(2500);
+    await sleep(2500);
+  });
+} else if (process.env.PART === "agents") {
   // click a button / menu item by its visible text, with a real mouse click
   const clickText = async (selector, text) => {
     const r = await evaluate(`(() => { const el = [...document.querySelectorAll(${JSON.stringify(selector)})].find(e => e.textContent.trim().startsWith(${JSON.stringify(text)}));

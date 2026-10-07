@@ -1,6 +1,6 @@
 # Mark: a help desk you actually enjoy talking to
 
-A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives on your screen, reacts to what you type, brings you pizza when you are hungry, bows when you say thanks, and walks away when you drag him into the corner bin. Behind him are three AI agents that can really check your laptop and read and write your files.
+A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives on your screen, reacts to what you type, brings you pizza when you are hungry, bows when you say thanks, and walks away when you drag him into the corner bin. Behind him are three AI agents that can really check your laptop, read and write your files, and find jobs and prepare applications for you. You can sign in with email and password or **with Google**.
 
 > The UI is open source (this repo). The backend it talks to (login service, AI agents, tools) is a separate **private** repo; this README explains how it works so you can see the whole picture.
 
@@ -10,16 +10,22 @@ A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives 
 
 Sign in with any email and password and say hello. It runs entirely in your browser with no backend, so it is a **demo mode**:
 
-- **Real:** Mark himself. His reactions, the dragging and the corner bin all work. Try *"i want pizza"*, *"dance for me"*, *"thank you"*, *"you are so cute"* or *"do some magic"*.
-- **Canned:** the login and the answers of the three agents (the real ones need the Java backend and local AI models). Voice, file upload and the laptop/file tools are switched off.
+- **Real:** Mark himself. His reactions, the dragging and the corner bin all work. Try *"i want pizza"*, *"dance for me"*, *"thank you"*, *"you are so cute"*, *"movie night"*, *"let's celebrate"*, *"i love you mark"* or *"working late at the office"*.
+- **Canned:** the login (including the demo Google button) and the answers of the three agents (the real ones need the Java backend and local AI models). Voice, file upload and the laptop/file tools are switched off.
 
-To see the agents doing real work (checking a laptop, reading and saving files), watch the video below. To run the demo yourself: `npm run build:demo` (output in `dist/`) or `VITE_DEMO=true npm run dev`.
+To see the agents doing real work (checking a laptop, reading and saving files), watch the first video below; the second shows what is new. To run the demo yourself: `npm run build:demo` (output in `dist/`) or `VITE_DEMO=true npm run dev`.
 
 ### Watch the full demo video
 
 [![Watch the demo](docs/media/poster.png)](docs/media/mark-demo.mp4)
 
 *Click the picture to play the full demo (about 2.5 minutes). Everything in it is recorded from the real app, nothing is mocked.*
+
+### What's new: Google sign-in, more of Mark, and the Jobs screen
+
+[![Watch what's new](docs/media/poster-new.png)](docs/media/mark-demo-new.mp4)
+
+*About 1.5 minutes. This one is recorded in the hosted **demo mode**, so the answers are canned, but Mark, the sign-in page and the Jobs screen are the real UI.*
 
 ## Talking to Mark is fun
 
@@ -36,6 +42,13 @@ Mark is built from code only: no model files, no video. Every pose is animated p
 | "do some magic" | does a magic trick |
 | "i am so sleepy zzz" | yawns and falls asleep with floating Zs |
 | "you are stupid" | gets hurt and sad |
+| "movie night tonight!" | brings a tub of popcorn |
+| "let's celebrate, party time!" | holds a cocktail and a cold drink, with sparkles, fireworks and balloons |
+| "my sister's wedding is tomorrow" | wears a crown and carries a bouquet |
+| "i love you mark" | gives you a bunch of red roses |
+| "working late at the office today" | sits at a desk and types on a laptop (we see the lid's back) |
+| "i need my morning coffee" | sips a real-looking coffee at his mouth |
+| "we had a breakup today" | shows a broken heart |
 
 | | |
 |---|---|
@@ -43,7 +56,12 @@ Mark is built from code only: no model files, no video. Every pose is animated p
 | ![thanks](docs/media/03-thanks.gif) | ![birthday](docs/media/04-birthday.gif) |
 | ![pizza](docs/media/05-pizza.gif) | ![dance](docs/media/06-dance.gif) |
 | ![magic](docs/media/07-magic.gif) | ![sleepy](docs/media/08-sleepy.gif) |
-| ![hurt](docs/media/09-hurt.gif) | |
+| ![hurt](docs/media/09-hurt.gif) | ![movie](docs/media/17-movie.gif) |
+| ![party](docs/media/18-party.gif) | ![wedding](docs/media/19-wedding.gif) |
+| ![love](docs/media/20-love.gif) | ![office](docs/media/21-office.gif) |
+| ![coffee](docs/media/22-coffee.gif) | ![heartbreak](docs/media/23-heartbreak.gif) |
+
+*The first nine clips are from the real app; the last eight (movie to heartbreak) are from the hosted demo mode.*
 
 ### Pick him up, put him anywhere, or send him away
 
@@ -86,7 +104,9 @@ The Interview agent can find real jobs, match them to your profile and prepare a
 - **Nothing is ever sent for you.** Mark prepares a *draft* cover note from your profile. **You** read it and press **Approve** (the AI has no way to), then **Open apply page** takes you to the job's own site where you submit it, and **I applied** records it.
 - The AI is checked: a job link that no tool returned, or a cover letter it wrote itself instead of saving a draft, is thrown away and asked again.
 
-The hosted demo has a made-up draft so you can try the Approve and apply buttons.
+The hosted demo has a made-up draft so you can try the Approve and apply buttons:
+
+![jobs: find jobs, approve a draft, then apply on the job site](docs/media/24-jobs.gif)
 
 ### How the backend fits together
 
@@ -111,6 +131,8 @@ auth-service  ----- signs JWTs ----->  help-desk (Spring Boot + Spring AI)
 ## Sign in
 
 The sign-in page offers **email and password** and **Continue with Google** (OAuth2 / OpenID Connect). The Google button uses Google's own sign-in; the backend checks Google's signed ID token against Google's public keys before it signs you in, so the UI never handles a Google password or secret. It appears active when the auth service has a Google client id (the UI reads it from `/api/v1/auth/config`), and is shown switched off with a note when it does not. The hosted demo has a demo version of the button.
+
+![sign in with Google (demo)](docs/media/16-google.gif)
 
 ## Run the UI
 

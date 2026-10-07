@@ -23,6 +23,11 @@ OUT=/tmp/mark-rec/part1 DEST=docs/media MP4=part1.mp4 node docs/demo/encode.cjs
 PART=agents APP=http://localhost:5173 OUT=/tmp/mark-rec/part2 node docs/demo/record.cjs
 OUT=/tmp/mark-rec/part2 DEST=docs/media MP4=part2.mp4 node docs/demo/encode.cjs
 
+# part 3 ("what is new": Google sign-in, newer looks, the Jobs screen) is recorded against the demo build, so it needs no backend:
+#   VITE_DEMO=true npm run dev -- --port 5199
+PART=new APP=http://localhost:5199 OUT=/tmp/mark-rec/part3 node docs/demo/record.cjs
+OUT=/tmp/mark-rec/part3 DEST=docs/media MP4=mark-demo-new.mp4 node docs/demo/encode.cjs
+
 # glue the two parts into mark-demo.mp4
 printf "file 'part1.mp4'\nfile 'part2.mp4'\n" > docs/media/parts.txt
 ffmpeg -f concat -safe 0 -i docs/media/parts.txt -c copy docs/media/mark-demo.mp4
