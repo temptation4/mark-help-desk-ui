@@ -874,6 +874,14 @@ const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, nood
  */
 const WORKING = []; // "holding" for the working gesture: nothing in his hands (see the desk in createProps)
 
+/** How high the top of a prop is above his grip: the point of it that goes to his mouth. (Steam sprites do not count.) */
+function biteHeight(prop) {
+  prop.updateMatrixWorld(true);
+  const box = new THREE.Box3();
+  prop.traverse((o) => { if (o.isMesh) box.expandByObject(o); });
+  return box.isEmpty() ? 0.3 : box.max.y;
+}
+
 function holdingFor(mood, props) {
   if (mood === "birthday") return [[1, props.cake, true], [0, props.gift, true]]; // a cake with candles, and a present
   if (mood === "party") return [[0, props.cocktail, true]]; // one cocktail
@@ -907,6 +915,7 @@ export function createProps(scene, arms, glowTexture, head) {
 
   const props = { cake: cake(glowTexture), gift: gift(), cocktail: cocktail(glowTexture), bouquet: bouquet(RED_ROSES, false), bouquetL: bouquet(RED_ROSES, false), bouquetMix: bouquet(), clipboard: clipboard(), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
   for (const name of FOODS) props[name] = BUILDERS[name](glowTexture);
+  FOODS.forEach((name) => { if (props[name].userData.rim === undefined) props[name].userData.rim = biteHeight(props[name]); }); // where he bites: the top of the food
   props.popcorn = popcorn();
   props.brokenheart = brokenHeart();
   Object.entries(props).forEach(([kind, p]) => { p.userData.kind = kind; p.visible = false; });
@@ -1012,11 +1021,11 @@ export function createProps(scene, arms, glowTexture, head) {
         if (keepUpright) hand.rotation.set(-arms[handIndex].rotation.x, 0, -arms[handIndex].rotation.z);
         else hand.rotation.set(0, 0, 0);
         // sipping: the cup tips its rim towards his face while the hand is raised
-        if (DRINKS.includes(prop.userData.kind)) {
-          hand.rotation.x -= 0.45 * sip; // the top of the mug tips back, towards his face
+        if (FOODS.includes(prop.userData.kind)) { // food and drinks both go to his mouth
+          hand.rotation.x -= (DRINKS.includes(prop.userData.kind) ? 0.45 : 0.2) * sip; // the top tips back, towards his face (a mug more than a burger)
           if (sip > 0.001) {
             // his arm is a stiff stick that cannot reach round the front of his head, so the cup is moved to where his mouth is: the middle of the
-            // visor, low down, just in front of the glass. The rim of the cup (not its base) is put at the mouth, so mouth and mug line up.
+            // visor, low down, just in front of the glass. The bite point (the rim of a cup, the top of a slice or a cone) is put at the mouth, so food and mouth line up.
             head.updateWorldMatrix(true, false);
             hand.updateWorldMatrix(true, false);
             mouthAt.set(0, 0.31, 0.95);
