@@ -37,7 +37,13 @@ const LABEL = {
   cheering: "is cheering",
   delighted: "is giggling",
   birthday: "is celebrating a birthday: a cake with lit candles, a present, balloons and a party hat",
-  party: "is at a party, toasting with a sparkling drink under balloons",
+  party: "is at a party with a cocktail and a cold drink, balloons, sparkles and fireworks",
+  heartbreak: "is heartbroken after a break-up, holding a broken heart, head hanging",
+  popcorn: "is tossing popcorn all around, the bucket held high",
+  working: "is working hard at a laptop on his desk, typing away with a mug of coffee",
+  meeting: "is in a meeting, presenting with a clipboard and nodding",
+  congrats: "is congratulating you, presenting a bouquet with a happy bounce and rose petals",
+  wedding: "is celebrating a wedding with a bouquet, a crown, floating hearts and rose petals",
   shopping: "is shopping with bags in both hands",
 
   // Food
@@ -48,7 +54,6 @@ const LABEL = {
   coffee: "is sipping hot coffee from a small cup",
   tea: "is sipping hot tea from a teacup",
   fries: "is eating fries",
-  popcorn: "is eating popcorn from a striped bucket on movie night",
   noodles: "is slurping hot Korean ramyeon",
   tteokbokki: "is eating spicy tteokbokki",
   veggies: "is munching fresh vegetables",

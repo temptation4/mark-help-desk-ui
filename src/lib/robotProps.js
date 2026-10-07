@@ -7,7 +7,7 @@
 import * as THREE from "three";
 
 // The gestures that give him something to hold (the food ones all work the same way: lift, bite, chew).
-export const FOODS = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea", "popcorn"];
+export const FOODS = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea"];
 export const DRINKS = ["coffee", "tea"]; // these are sipped (cup tilts towards his face) rather than bitten and chewed
 
 const { PI } = Math;
@@ -304,27 +304,37 @@ function chips() {
   return g;
 }
 
-/** Movie night: a red and white striped popcorn bucket heaped with fluffy popcorn. */
+/** Movie night: a big red and white striped bucket, heaped with golden popcorn that spills over the rim. */
 function popcorn() {
   const g = new THREE.Group();
   const red = paint(0xe03a3a, 0.45), white = paint(0xffffff, 0.45);
-  // the bucket: eight stripes around a cone that is wider at the top
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * PI * 2;
-    const stripe = part(g, new THREE.BoxGeometry(0.1, 0.34, 0.025), i % 2 ? white : red, Math.cos(a) * 0.145, 0.17, Math.sin(a) * 0.145);
+  // the bucket: ten stripes around a cone that is wider at the top, with a red rim
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * PI * 2;
+    const stripe = part(g, new THREE.BoxGeometry(0.11, 0.38, 0.025), i % 2 ? white : red, Math.cos(a) * 0.16, 0.19, Math.sin(a) * 0.16);
     stripe.rotation.y = -a + PI / 2;
-    stripe.rotation.z = Math.cos(a) * 0.1; // leans out at the top
-    stripe.rotation.x = -Math.sin(a) * 0.1;
+    stripe.rotation.z = Math.cos(a) * 0.14; // leans out at the top
+    stripe.rotation.x = -Math.sin(a) * 0.14;
   }
-  part(g, new THREE.CylinderGeometry(0.13, 0.13, 0.02, 16), red, 0, 0.01); // the bottom
-  // the popcorn: a heap of fluffy cream puffs with a few buttery yellow ones
-  const cream = paint(0xfff1c9, 0.7), butter = paint(0xf6c445, 0.6);
-  for (let i = 0; i < 16; i++) {
-    const a = i * 2.4, ring = 0.03 + (i % 5) * 0.03;
-    const puff = part(g, new THREE.IcosahedronGeometry(0.055 + (i % 3) * 0.012, 0), i % 4 === 0 ? butter : cream,
-      Math.cos(a) * ring, 0.36 + (i % 4) * 0.035, Math.sin(a) * ring);
-    puff.rotation.set(i, i * 2, 0);
+  part(g, new THREE.CylinderGeometry(0.14, 0.14, 0.02, 16), red, 0, 0.01); // the bottom
+  const rim = part(g, new THREE.TorusGeometry(0.2, 0.022, 8, 24), red, 0, 0.385);
+  rim.rotation.x = PI / 2;
+  // the popcorn: a dome of golden, bumpy puffs (three little balls each) that rises well above the rim so it reads as popcorn
+  const golden = [paint(0xffd95a, 0.7), paint(0xffe9a0, 0.7), paint(0xf5b83d, 0.7), paint(0xfff3cf, 0.7)];
+  for (let i = 0; i < 34; i++) {
+    const a = i * 2.4, ring = 0.2 * Math.sqrt(i / 34);
+    const lift = Math.sqrt(Math.max(0, 1 - (ring / 0.22) ** 2)) * 0.17;
+    const puff = new THREE.Group();
+    puff.position.set(Math.cos(a) * ring, 0.4 + lift + (i % 3) * 0.012, Math.sin(a) * ring);
+    for (let k = 0; k < 3; k++) {
+      part(puff, new THREE.SphereGeometry(0.045 + ((i + k) % 3) * 0.01, 8, 6), golden[(i + k) % 4], (k - 1) * 0.04, (k % 2) * 0.03, ((k * 5) % 3 - 1) * 0.03);
+    }
+    g.add(puff);
   }
+  // a few puffs tumbling over the front of the rim
+  [[0.13, 0.33, 0.17], [-0.1, 0.31, 0.18], [0.02, 0.29, 0.21]].forEach(([x, y, z], i) => {
+    part(g, new THREE.SphereGeometry(0.05, 8, 6), golden[i], x, y, z);
+  });
   return g;
 }
 
@@ -390,20 +400,317 @@ function gift() {
   return g;
 }
 
-/** A tall glass of sparkling drink: golden fizz, bubbles rising, little sparkles above. */
-function flute(glowTexture) {
+/** A clipboard with a few lines of notes, for the meeting. */
+function clipboard() {
   const g = new THREE.Group();
-  const glass = new THREE.MeshPhysicalMaterial({ color: 0xdff3ff, transparent: true, opacity: 0.55, roughness: 0.05, clearcoat: 1 });
-  part(g, new THREE.CylinderGeometry(0.08, 0.05, 0.34, 20, 1, true), glass, 0, 0.36); // the glass, open at the top
-  part(g, new THREE.CylinderGeometry(0.075, 0.048, 0.24, 20), paint(0xffc82e, 0.2), 0, 0.31); // golden drink
-  part(g, new THREE.CylinderGeometry(0.012, 0.012, 0.2, 8), glass, 0, 0.09); // stem
-  part(g, new THREE.CylinderGeometry(0.07, 0.07, 0.015, 20), glass, 0, 0); // base
-  g.userData.bubbles = [0, 1, 2, 3, 4].map((i) => part(g, new THREE.SphereGeometry(0.012, 8, 6), paint(0xffffff, 0.2), (i - 2) * 0.02, 0.2, ((i * 7) % 5 - 2) * 0.012));
-  g.userData.sparks = [0, 1, 2, 3].map(() => {
-    const spark = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture, color: 0xffe9a8, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false }));
-    g.add(spark);
-    return spark;
+  part(g, new THREE.BoxGeometry(0.34, 0.46, 0.025), paint(0x8b5a2b, 0.6), 0, 0.25);
+  part(g, new THREE.BoxGeometry(0.3, 0.4, 0.012), paint(0xffffff, 0.8), 0, 0.25, 0.018); // the paper
+  part(g, new THREE.BoxGeometry(0.14, 0.05, 0.03), new THREE.MeshStandardMaterial({ color: 0xb0b7c3, metalness: 0.6, roughness: 0.35 }), 0, 0.47, 0.02); // the clip
+  for (let i = 0; i < 6; i++) part(g, new THREE.BoxGeometry(i === 5 ? 0.14 : 0.22, 0.015, 0.004), paint(i % 2 ? 0x94a3b8 : 0x334155, 0.8), (i === 5 ? -0.04 : 0), 0.38 - i * 0.055, 0.026); // notes
+  return g;
+}
+
+/** Rounded rectangle path on a canvas. */
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/**
+ * What is on the laptop's screen, drawn on a canvas so it looks like a real desktop: a wallpaper, a menu bar with a clock, an
+ * editor window with Java code (tabs, line numbers, syntax colours), a terminal under it, and a dock with app icons.
+ * `cursorOn` is the blinking text cursor; two textures (on and off) are swapped to make it blink.
+ */
+function laptopScreen(cursorOn) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 640;
+  canvas.height = 400;
+  const ctx = canvas.getContext("2d");
+  // wallpaper
+  const wall = ctx.createLinearGradient(0, 0, 640, 400);
+  wall.addColorStop(0, "#4338ca");
+  wall.addColorStop(0.55, "#9333ea");
+  wall.addColorStop(1, "#fb923c");
+  ctx.fillStyle = wall;
+  ctx.fillRect(0, 0, 640, 400);
+  // menu bar
+  ctx.fillStyle = "rgba(255,255,255,0.28)";
+  ctx.fillRect(0, 0, 640, 20);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 12px system-ui, sans-serif";
+  ctx.fillText("●", 10, 14);
+  ctx.fillText("Code", 30, 14);
+  ctx.font = "12px system-ui, sans-serif";
+  ["File", "Edit", "View", "Run", "Terminal"].forEach((item, i) => ctx.fillText(item, 76 + i * 44, 14));
+  ctx.fillText("Wed 10:42", 566, 14);
+  // the editor window
+  const wx = 40, wy = 36, ww = 560, wh = 250;
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  roundRect(ctx, wx + 4, wy + 8, ww, wh, 10);
+  ctx.fill();
+  ctx.fillStyle = "#1e1e2e";
+  roundRect(ctx, wx, wy, ww, wh, 10);
+  ctx.fill();
+  ctx.fillStyle = "#2a2a3c";
+  roundRect(ctx, wx, wy, ww, 24, 10);
+  ctx.fill();
+  ["#ff5f57", "#febc2e", "#28c840"].forEach((color, i) => { ctx.fillStyle = color; ctx.beginPath(); ctx.arc(wx + 16 + i * 17, wy + 12, 5, 0, Math.PI * 2); ctx.fill(); });
+  ctx.fillStyle = "#cbd5e1";
+  ctx.font = "11px system-ui, sans-serif";
+  ctx.fillText("Mark.java — help-desk", wx + 220, wy + 16);
+  // sidebar with files
+  ctx.fillStyle = "#181825";
+  ctx.fillRect(wx, wy + 24, 120, wh - 24);
+  ctx.font = "11px system-ui, sans-serif";
+  [["▾ help-desk", "#cbd5e1"], ["   ▾ service", "#94a3b8"], ["      Mark.java", "#ffffff"], ["      AIService.java", "#94a3b8"], ["   ▸ controller", "#94a3b8"], ["   ▸ config", "#94a3b8"], ["   pom.xml", "#94a3b8"]].forEach(([text, color], i) => {
+    if (i === 2) { ctx.fillStyle = "#313244"; ctx.fillRect(wx, wy + 30 + i * 18, 120, 18); }
+    ctx.fillStyle = color;
+    ctx.fillText(text, wx + 8, wy + 43 + i * 18);
   });
+  // the code
+  ctx.font = "12px ui-monospace, Menlo, Consolas, monospace";
+  const code = [
+    [["public ", "#cba6f7"], ["class ", "#cba6f7"], ["Mark ", "#f9e2af"], ["{", "#cdd6f4"]],
+    [["    @Autowired ", "#fab387"], ["ChatClient ", "#f9e2af"], ["chat;", "#cdd6f4"]],
+    [[""]],
+    [["    public ", "#cba6f7"], ["String ", "#f9e2af"], ["reply", "#89b4fa"], ["(String q) {", "#cdd6f4"]],
+    [["        // Mark reacts, then answers", "#6c7086"]],
+    [["        return ", "#cba6f7"], ["chat", "#cdd6f4"], [".prompt()", "#89b4fa"]],
+    [["            .user", "#89b4fa"], ["(q)", "#cdd6f4"], [".call()", "#89b4fa"], [".content();", "#cdd6f4"]],
+    [["    }", "#cdd6f4"]],
+    [["}", "#cdd6f4"]],
+  ];
+  code.forEach((tokens, line) => {
+    const y = wy + 46 + line * 17;
+    ctx.fillStyle = "#585b70";
+    ctx.fillText(String(line + 1).padStart(2, " "), wx + 128, y);
+    let x = wx + 156;
+    tokens.forEach(([text, color]) => { ctx.fillStyle = color; ctx.fillText(text, x, y); x += ctx.measureText(text).width; });
+    if (cursorOn && line === 6) { ctx.fillStyle = "#f5e0dc"; ctx.fillRect(x + 1, y - 11, 2, 14); }
+  });
+  // the terminal under it
+  ctx.fillStyle = "#11111b";
+  roundRect(ctx, wx + 60, 300, 460, 56, 8);
+  ctx.fill();
+  ctx.font = "11px ui-monospace, Menlo, Consolas, monospace";
+  ctx.fillStyle = "#a6e3a1";
+  ctx.fillText("$ mvn spring-boot:run", wx + 72, 318);
+  ctx.fillStyle = "#94e2d5";
+  ctx.fillText("Started HelpDeskApplication in 3.7 seconds", wx + 72, 334);
+  ctx.fillStyle = "#cdd6f4";
+  ctx.fillText(cursorOn ? "$ █" : "$", wx + 72, 350);
+  // the dock
+  ctx.fillStyle = "rgba(255,255,255,0.3)";
+  roundRect(ctx, 190, 364, 260, 30, 10);
+  ctx.fill();
+  ["#38bdf8", "#4ade80", "#f472b6", "#fbbf24", "#a78bfa", "#f87171", "#e2e8f0"].forEach((color, i) => { ctx.fillStyle = color; roundRect(ctx, 200 + i * 35, 368, 24, 22, 6); ctx.fill(); });
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+/** The keyboard and trackpad of the laptop, drawn on a canvas: rows of rounded keys on a dark deck. */
+function laptopKeyboard() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 320;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#cfd5de"; // the aluminium
+  ctx.fillRect(0, 0, 512, 320);
+  ctx.fillStyle = "#1f2430";
+  roundRect(ctx, 20, 14, 472, 190, 8);
+  ctx.fill();
+  const rows = [14, 13, 14, 13, 12];
+  rows.forEach((count, row) => {
+    const gap = 3, width = (472 - 16 - gap * (count - 1)) / count, y = 22 + row * 35;
+    for (let i = 0; i < count; i++) {
+      ctx.fillStyle = "#2f3646";
+      roundRect(ctx, 28 + i * (width + gap), y, width, 30, 4);
+      ctx.fill();
+    }
+  });
+  ctx.fillStyle = "#c2c9d4"; // the trackpad
+  roundRect(ctx, 176, 222, 160, 84, 8);
+  ctx.fill();
+  ctx.strokeStyle = "#aab2bf";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+/**
+ * His desk for "working": a wooden desk in front of him with an open laptop (a thin aluminium body, a black bezel with a webcam, a real-looking
+ * screen that faces us; he types on the keyboard from behind it), a mouse, a mug of coffee and a little plant. The screen throws a soft blue light
+ * on him. It stands on the floor in front of him, so it hides his legs.
+ */
+function deskWithLaptop(glowTexture) {
+  const g = new THREE.Group();
+  g.position.z = 0.65;
+  const wood = paint(0xb9814a, 0.5), darkWood = paint(0x946438, 0.6);
+  part(g, new THREE.BoxGeometry(2.5, 0.07, 1.0), wood, 0, 0.86, 0); // the top
+  [-1, 1].forEach((side) => part(g, new THREE.BoxGeometry(0.09, 0.83, 0.85), darkWood, side * 1.15, 0.415, 0)); // the sides
+  part(g, new THREE.BoxGeometry(2.3, 0.55, 0.04), darkWood, 0, 0.55, -0.4); // the back panel
+  // the laptop: aluminium base with the keyboard on top, a hinge, and the screen standing at the far (camera) side
+  const aluminium = new THREE.MeshStandardMaterial({ color: 0xd5dae2, metalness: 0.75, roughness: 0.3 });
+  part(g, new THREE.BoxGeometry(1.0, 0.035, 0.68), aluminium, 0, 0.92, -0.02);
+  const keys = part(g, new THREE.PlaneGeometry(0.98, 0.66), new THREE.MeshStandardMaterial({ map: laptopKeyboard(), roughness: 0.5 }), 0, 0.9385, -0.02);
+  keys.rotation.x = -PI / 2;
+  part(g, new THREE.CylinderGeometry(0.018, 0.018, 0.9, 12), new THREE.MeshStandardMaterial({ color: 0x9aa3b2, metalness: 0.8, roughness: 0.3 }), 0, 0.945, 0.32).rotation.z = PI / 2; // the hinge
+  const screen = new THREE.Group();
+  screen.position.set(0, 0.945, 0.32);
+  screen.rotation.x = -0.2; // leans back a little
+  part(screen, new THREE.BoxGeometry(1.0, 0.66, 0.025), aluminium, 0, 0.33, -0.006); // the lid
+  part(screen, new THREE.BoxGeometry(0.97, 0.63, 0.012), new THREE.MeshStandardMaterial({ color: 0x0a0a0f, roughness: 0.2 }), 0, 0.33, 0.01); // the black bezel
+  const screens = [laptopScreen(true), laptopScreen(false)];
+  const display = part(screen, new THREE.PlaneGeometry(0.9, 0.5625), new THREE.MeshBasicMaterial({ map: screens[0], toneMapped: false }), 0, 0.325, 0.0175);
+  part(screen, new THREE.CircleGeometry(0.008, 12), new THREE.MeshBasicMaterial({ color: 0x1f2937 }), 0, 0.625, 0.0175); // the webcam
+  part(screen, new THREE.CircleGeometry(0.003, 8), new THREE.MeshBasicMaterial({ color: 0x4ade80, toneMapped: false }), 0.02, 0.625, 0.0178); // its green light
+  g.userData.display = display;
+  g.userData.screens = screens;
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture, color: 0x93c5fd, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false, opacity: 0.35 }));
+  glow.position.set(0, 0.33, 0.2);
+  glow.scale.set(1.8, 1.3, 1);
+  screen.add(glow);
+  const light = new THREE.PointLight(0x9ec5ff, 1.2, 3.2); // the screen lights his face and chest
+  light.position.set(0, 0.5, 0.5);
+  screen.add(light);
+  g.add(screen);
+  // a wireless mouse
+  const mouse = part(g, new THREE.SphereGeometry(0.07, 16, 12), new THREE.MeshStandardMaterial({ color: 0xe5e7eb, metalness: 0.4, roughness: 0.4 }), 0.78, 0.915, 0.2);
+  mouse.scale.set(0.8, 0.5, 1.25);
+  // a mug of coffee
+  part(g, new THREE.CylinderGeometry(0.075, 0.065, 0.14, 16), paint(0xffffff, 0.4), -0.95, 0.965, 0.15);
+  part(g, new THREE.CylinderGeometry(0.065, 0.065, 0.01, 16), paint(0x3b2314, 0.3), -0.95, 1.035, 0.15);
+  part(g, new THREE.TorusGeometry(0.045, 0.012, 8, 12), paint(0xffffff, 0.4), -0.875, 0.965, 0.15).rotation.y = PI / 2;
+  // a little plant in a pot
+  part(g, new THREE.CylinderGeometry(0.07, 0.055, 0.1, 14), paint(0xd97757, 0.6), 1.0, 0.945, -0.2);
+  [-0.5, 0, 0.5].forEach((tilt, i) => {
+    const leaf = part(g, new THREE.SphereGeometry(0.06, 10, 8), paint(0x3f9d4b, 0.55), 1.0 + tilt * 0.1, 1.04 + (i === 1 ? 0.04 : 0), -0.2);
+    leaf.scale.set(0.5, 1.4, 0.5);
+    leaf.rotation.z = -tilt;
+  });
+  return g;
+}
+
+/** A broken heart: two red halves with a jagged crack between them, held a little apart. */
+function brokenHeart() {
+  const g = new THREE.Group();
+  const half = (mirror) => {
+    const s = new THREE.Shape();
+    s.moveTo(0, -0.32);
+    s.bezierCurveTo(-0.15, -0.18, -0.36, 0.0, -0.36, 0.18);
+    s.bezierCurveTo(-0.36, 0.34, -0.2, 0.4, -0.1, 0.34);
+    s.bezierCurveTo(-0.05, 0.31, -0.01, 0.26, 0, 0.2);
+    s.lineTo(-0.03, 0.08);
+    s.lineTo(0.03, -0.04);
+    s.lineTo(-0.02, -0.17);
+    s.lineTo(0, -0.32);
+    const material = paint(0xe11d48, 0.35);
+    material.side = THREE.DoubleSide; // the mirrored half is inside out otherwise
+    const mesh = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: 0.06, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.012, bevelSegments: 2, curveSegments: 12 }), material);
+    mesh.scale.x = mirror ? -1 : 1;
+    mesh.position.y = 0.4;
+    g.add(mesh);
+    return mesh;
+  };
+  g.userData.halves = [half(false), half(true)];
+  return g;
+}
+
+/** A sparkle sprite, used above the cocktail. */
+function sparkle(glowTexture, color = 0xffe9a8) {
+  return new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false }));
+}
+
+const clearGlass = () => new THREE.MeshPhysicalMaterial({ color: 0xdff3ff, transparent: true, opacity: 0.5, roughness: 0.05, clearcoat: 1 });
+
+/** A lemon slice for the rim of a glass. */
+function lemonWheel(parent, x, y) {
+  const wheel = part(parent, new THREE.CylinderGeometry(0.06, 0.06, 0.012, 20), paint(0xffe14d, 0.5), x, y, 0);
+  wheel.rotation.z = PI / 2.6;
+  return wheel;
+}
+
+/** A cocktail: a pink drink in a stemmed glass with a little paper umbrella, a cherry, a lemon slice and sparkles above. */
+function cocktail(glowTexture) {
+  const g = new THREE.Group();
+  part(g, new THREE.CylinderGeometry(0.16, 0.012, 0.2, 24, 1, true), clearGlass(), 0, 0.3); // the glass, open at the top
+  part(g, new THREE.CylinderGeometry(0.145, 0.014, 0.16, 24), paint(0xff5f93, 0.2), 0, 0.285); // the pink drink
+  part(g, new THREE.CylinderGeometry(0.012, 0.012, 0.2, 8), clearGlass(), 0, 0.1); // stem
+  part(g, new THREE.CylinderGeometry(0.075, 0.075, 0.015, 20), clearGlass(), 0, 0); // base
+  const stick = part(g, new THREE.CylinderGeometry(0.006, 0.006, 0.26, 6), paint(0xd6b98c), 0.04, 0.42);
+  stick.rotation.z = -0.25;
+  const umbrella = part(g, new THREE.ConeGeometry(0.1, 0.06, 12), paint(0x4ade80, 0.4), 0.075, 0.55);
+  umbrella.rotation.z = -0.25;
+  part(g, new THREE.SphereGeometry(0.035, 10, 8), paint(0xd62839, 0.3), -0.12, 0.41); // cherry
+  lemonWheel(g, 0.15, 0.39);
+  g.userData.sparks = [0, 1, 2, 3, 4].map((i) => { const s = sparkle(glowTexture, [0xffe9a8, 0xff9fc2, 0xa5f3fc][i % 3]); g.add(s); return s; });
+  return g;
+}
+
+/** A cold drink: dark cola with ice cubes, a striped straw and a lemon slice in a tall glass, bubbles rising. */
+function coldDrink() {
+  const g = new THREE.Group();
+  part(g, new THREE.CylinderGeometry(0.105, 0.085, 0.36, 24, 1, true), clearGlass(), 0, 0.18); // the glass
+  part(g, new THREE.CylinderGeometry(0.098, 0.082, 0.3, 24), paint(0x4a2511, 0.15), 0, 0.155); // the cola
+  part(g, new THREE.CylinderGeometry(0.1, 0.1, 0.012, 24), paint(0xe9d5b5, 0.4), 0, 0.31); // the foam on top
+  [[-0.04, 0.04], [0.04, -0.02], [0, -0.05]].forEach(([x, z], i) => { // ice cubes
+    const ice = part(g, new THREE.BoxGeometry(0.07, 0.07, 0.07), new THREE.MeshPhysicalMaterial({ color: 0xcfeeff, transparent: true, opacity: 0.8, roughness: 0.1 }), x, 0.33 + i * 0.012, z);
+    ice.rotation.set(0.4 + i, 0.5 * i, 0.3);
+  });
+  const straw = part(g, new THREE.CylinderGeometry(0.011, 0.011, 0.34, 8), paint(0xe03a3a, 0.4), 0.05, 0.27);
+  straw.rotation.z = -0.22;
+  const strawBend = part(g, new THREE.CylinderGeometry(0.011, 0.011, 0.08, 8), paint(0xffffff, 0.4), 0.115, 0.43);
+  strawBend.rotation.z = PI / 2 - 0.5;
+  lemonWheel(g, 0.105, 0.34);
+  g.userData.bubbles = [0, 1, 2, 3, 4].map((i) => part(g, new THREE.SphereGeometry(0.012, 8, 6), paint(0xffffff, 0.2), (i - 2) * 0.03, 0.1, ((i * 7) % 5 - 2) * 0.02));
+  return g;
+}
+
+/** A bridal bouquet: roses and little white flowers in a white paper cone, tied with a pink ribbon. */
+function bouquet() {
+  const g = new THREE.Group();
+  part(g, new THREE.CylinderGeometry(0.012, 0.012, 0.3, 8), paint(0x3f9d4b), 0, 0.1); // stems
+  part(g, new THREE.ConeGeometry(0.12, 0.3, 14, 1, true), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, side: THREE.DoubleSide }), 0, 0.22).rotation.x = PI; // the paper
+  const ribbon = part(g, new THREE.TorusGeometry(0.045, 0.012, 8, 16), paint(0xff6fa5, 0.4), 0, 0.16);
+  ribbon.rotation.x = PI / 2;
+  const roses = [0xff4d6d, 0xff9fb8, 0xffffff, 0xff6fa5, 0xffc2d4, 0xff4d6d, 0xffffff];
+  roses.forEach((color, i) => {
+    const a = i * 2.2, r = i === 0 ? 0 : 0.1;
+    const x = Math.cos(a) * r, z = Math.sin(a) * r, y = 0.4 + (i === 0 ? 0.06 : 0.01 * (i % 3));
+    part(g, new THREE.SphereGeometry(0.075, 14, 10), paint(color, 0.45), x, y, z);
+    const inner = part(g, new THREE.TorusGeometry(0.045, 0.014, 6, 12), paint(color, 0.5), x, y + 0.045, z); // petals curling in the middle
+    inner.rotation.x = PI / 2;
+  });
+  for (let i = 0; i < 9; i++) { // baby's breath
+    const a = i * 1.7;
+    part(g, new THREE.SphereGeometry(0.018, 6, 5), paint(0xffffff, 0.6), Math.cos(a) * 0.17, 0.38 + (i % 3) * 0.04, Math.sin(a) * 0.15);
+  }
+  return g;
+}
+
+/** A small gold crown with pearls, worn on top of his head for the wedding. */
+function crown() {
+  const g = new THREE.Group();
+  const gold = new THREE.MeshStandardMaterial({ color: 0xf5c542, metalness: 0.15, roughness: 0.35, emissive: 0x6b4e00, emissiveIntensity: 0.5 }); // not very metallic: there is nothing for it to reflect
+  const band = new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.025, 8, 28), gold);
+  band.rotation.x = PI / 2;
+  g.add(band);
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 7) * PI * 2;
+    const spike = part(g, new THREE.ConeGeometry(0.04, 0.16, 8), gold, Math.cos(a) * 0.27, 0.09, Math.sin(a) * 0.27);
+    spike.scale.y = i % 2 ? 0.8 : 1.15;
+    part(g, new THREE.SphereGeometry(0.03, 8, 6), paint(0xffffff, 0.2), Math.cos(a) * 0.27, 0.19 * (i % 2 ? 0.8 : 1.15) + 0.04, Math.sin(a) * 0.27); // pearl on each spike
+  }
   return g;
 }
 
@@ -441,17 +748,24 @@ function partyHat() {
 }
 
 // how much to enlarge each prop when he holds it (1 = as built)
-const SIZE = { cake: 1.9, gift: 1.5, flute: 1.9, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.6, coffee: 2.1, tea: 2.1 };
+const SIZE = { cake: 1.9, gift: 1.5, cocktail: 1.9, colddrink: 1.8, bouquet: 2.0, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.1, tea: 2.1 };
 
-const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea, popcorn };
+const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
 
 /**
  * What he holds for each gesture: [which hand (0 = his left, 1 = his right), prop, keepUpright].
  * keepUpright props (food, cake) stay level whichever way the arm swings; bags and balloons just hang from it.
  */
+const WORKING = []; // "holding" for the working gesture: nothing in his hands (see the desk in createProps)
+
 function holdingFor(mood, props) {
   if (mood === "birthday") return [[1, props.cake, true], [0, props.gift, true]]; // a cake with candles, and a present
-  if (mood === "party") return [[0, props.flute, true]]; // a toast with a sparkling drink
+  if (mood === "party") return [[0, props.cocktail, true], [1, props.colddrink, true]]; // a cocktail and a cold drink
+  if (mood === "wedding" || mood === "love" || mood === "congrats") return [[1, props.bouquet, true]]; // flowers for love, marriage and congratulations
+  if (mood === "meeting") return [[1, props.clipboard, true]];
+  if (mood === "popcorn") return [[1, props.popcorn, true]]; // held up high, popcorn flying out of it
+  if (mood === "heartbreak") return [[1, props.brokenheart, true]];
+  if (mood === "working") return WORKING; // no hand props: the desk with the laptop stands in front of him
   if (mood === "shopping") return [[0, props.bagL, false], [1, props.bagR, false]];
   if (FOODS.includes(mood)) return [[1, props[mood], true]];
   return null;
@@ -473,11 +787,13 @@ export function createProps(scene, arms, glowTexture, head) {
     return hand;
   });
 
-  const props = { cake: cake(glowTexture), gift: gift(), flute: flute(glowTexture), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
+  const props = { cake: cake(glowTexture), gift: gift(), cocktail: cocktail(glowTexture), colddrink: coldDrink(), bouquet: bouquet(), clipboard: clipboard(), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
   for (const name of FOODS) props[name] = BUILDERS[name](glowTexture);
+  props.popcorn = popcorn();
+  props.brokenheart = brokenHeart();
   Object.entries(props).forEach(([kind, p]) => { p.userData.kind = kind; p.visible = false; });
-  hands[1].add(props.cake, props.bagR, ...FOODS.map((name) => props[name]));
-  hands[0].add(props.flute, props.gift, props.bagL);
+  hands[1].add(props.popcorn, props.brokenheart, props.clipboard, props.colddrink, props.bouquet, props.cake, props.bagR, ...FOODS.map((name) => props[name]));
+  hands[0].add(props.cocktail, props.gift, props.bagL);
 
   // the rest of the party: balloons either side of him, and a hat
   const balloons = partyBalloons();
@@ -501,12 +817,58 @@ export function createProps(scene, arms, glowTexture, head) {
     return piece;
   });
 
+  // fireworks and fountains of sparks for the party ("patakhe"): bursts high up either side of him, fountains on the floor
+  const burstColors = [0xff4d6d, 0xffd23f, 0x4ea8ff, 0x7ee081, 0xc084fc];
+  const bursts = [[-1.25, 3.3, 0], [1.3, 3.55, 0.33], [0.05, 4.05, 0.66]].map(([x, y, delay], b) => ({
+    x, y, delay, sparks: Array.from({ length: 16 }, () => { const s = sparkle(glowTexture, burstColors[b % 5]); s.visible = false; scene.add(s); return s; }),
+  }));
+  const fountains = [-0.85, 0.85].map((x) => ({
+    x, sparks: Array.from({ length: 12 }, (_, k) => { const s = sparkle(glowTexture, k % 2 ? 0xffb347 : 0xffe9a8); s.visible = false; scene.add(s); return s; }),
+  }));
+
+  // the wedding: a crown and a shower of rose petals
+  const weddingCrown = crown();
+  weddingCrown.position.set(0, 1.13, 0.02); // sits on top of his head, around the antenna
+  weddingCrown.scale.setScalar(1.2);
+  weddingCrown.visible = false;
+  head.add(weddingCrown);
+  const petals = Array.from({ length: 24 }, (_, i) => {
+    const petal = new THREE.Mesh(
+      new THREE.CircleGeometry(0.045, 8),
+      new THREE.MeshBasicMaterial({ color: [0xffc2d4, 0xffffff, 0xff9fb8][i % 3], side: THREE.DoubleSide, transparent: true, toneMapped: false }),
+    );
+    petal.scale.set(1, 0.65, 1);
+    petal.userData = { x: ((i * 0.41) % 1) * 3.2 - 1.6, z: (i % 5) * 0.15 - 0.1, offset: (i * 0.137) % 1 };
+    petal.visible = false;
+    scene.add(petal);
+    return petal;
+  });
+
+  // popcorn bits that pop out of the bucket, fly in arcs all around him and fall
+  const popBits = Array.from({ length: 30 }, (_, i) => {
+    const bit = new THREE.Group();
+    const color = [0xffd95a, 0xffe9a0, 0xfff3cf, 0xf5b83d][i % 4];
+    for (let k = 0; k < 3; k++) part(bit, new THREE.SphereGeometry(0.05 + (k % 2) * 0.012, 8, 6), paint(color, 0.7), (k - 1) * 0.04, (k % 2) * 0.03, 0);
+    bit.userData = { vx: (((i * 0.37) % 1) - 0.5) * 3.4, vy: 1.6 + ((i * 0.61) % 1) * 1.6, vz: ((i * 0.29) % 1) * 0.8 - 0.2, offset: i / 30, spin: 2 + (i % 5) };
+    bit.scale.setScalar(1.4);
+    bit.visible = false;
+    scene.add(bit);
+    return bit;
+  });
+  const bucketAt = new THREE.Vector3();
+
+  const desk = deskWithLaptop(glowTexture);
+  desk.visible = false;
+  scene.add(desk);
+
   let holding = null; // what is in his hands right now; it stays until it has shrunk away
+  let current = ""; // the gesture he is playing (the bouquet is shared by the wedding, love and congratulations)
 
   return {
     /** Choose what he holds for this mood. A mood with nothing to hold leaves the current props to shrink away. */
     setMood(mood) {
       holding = holdingFor(mood, props) ?? holding;
+      current = mood;
     },
 
     /** `amount` runs from 0 (nothing in his hands) to 1 (fully shown). */
@@ -515,6 +877,12 @@ export function createProps(scene, arms, glowTexture, head) {
       confetti.forEach((c) => { c.visible = false; });
       balloons.visible = false;
       hat.visible = false;
+      weddingCrown.visible = false;
+      desk.visible = false;
+      popBits.forEach((b) => { b.visible = false; });
+      petals.forEach((p) => { p.visible = false; });
+      bursts.forEach((b) => b.sparks.forEach((s) => { s.visible = false; }));
+      fountains.forEach((f) => f.sparks.forEach((s) => { s.visible = false; }));
       if (!holding || amount < 0.02) return;
 
       holding.forEach(([handIndex, prop, keepUpright]) => {
@@ -537,12 +905,12 @@ export function createProps(scene, arms, glowTexture, head) {
           puff.material.opacity = amount * 0.85 * Math.sin(Math.PI * phase);
         });
       });
-      props.flute.userData.bubbles.forEach((bubble, i) => {
-        bubble.position.y = 0.2 + ((t * 0.5 + i * 0.2) % 1) * 0.22;
+      props.colddrink.userData.bubbles.forEach((bubble, i) => {
+        bubble.position.y = 0.06 + ((t * 0.5 + i * 0.2) % 1) * 0.24;
       });
-      props.flute.userData.sparks.forEach((spark, i) => {
+      props.cocktail.userData.sparks.forEach((spark, i) => {
         const twinkle = 0.5 + 0.5 * Math.sin(t * 7 + i * 2);
-        spark.position.set(Math.cos(t * 1.5 + i * 1.6) * 0.12, 0.55 + (i % 2) * 0.08, Math.sin(t * 1.5 + i * 1.6) * 0.08);
+        spark.position.set(Math.cos(t * 1.5 + i * 1.6) * 0.2, 0.62 + (i % 2) * 0.1, Math.sin(t * 1.5 + i * 1.6) * 0.1);
         spark.scale.setScalar(0.06 + 0.16 * twinkle);
         spark.material.opacity = twinkle;
       });
@@ -551,7 +919,65 @@ export function createProps(scene, arms, glowTexture, head) {
         props.cake.userData.flames.forEach((flame, i) => flame.scale.setScalar(0.2 + Math.sin(t * 17 + i * 2) * 0.025 + Math.sin(t * 29 + i) * 0.015));
       }
 
-      if (props.cake.visible || props.flute.visible) { // the rest of the party: balloons, hat and confetti
+      if (props.popcorn.visible) { // popcorn pops out of the bucket and scatters around him
+        props.popcorn.getWorldPosition(bucketAt);
+        popBits.forEach((bit) => {
+          const { vx, vy, vz, offset, spin } = bit.userData;
+          const p = (t * 0.55 + offset) % 1, s = p * 1.2; // s = seconds in the air
+          bit.visible = true;
+          bit.position.set(bucketAt.x + vx * s * 0.6, bucketAt.y + 0.6 + vy * s - 3.2 * s * s, bucketAt.z + vz * s);
+          bit.rotation.set(t * spin, t * spin * 0.7, 0);
+          bit.scale.setScalar(1.4 * amount * (p > 0.9 ? (1 - p) * 10 : 1));
+        });
+      }
+
+      if (props.brokenheart.visible) { // the two halves drift a little apart and back
+        const [left, right] = props.brokenheart.userData.halves;
+        const gap = 0.09 + Math.sin(t * 1.6) * 0.02;
+        left.position.x = -gap;
+        right.position.x = gap;
+        left.rotation.z = 0.12;
+        right.rotation.z = -0.12;
+      }
+
+      if (holding === WORKING) { // the desk with the laptop pops up in front of him
+        desk.visible = true;
+        desk.scale.setScalar(Math.max(0.01, amount));
+        desk.userData.display.material.map = desk.userData.screens[Math.floor(t * 2) % 2]; // the text cursor blinks
+      }
+
+      if (props.cocktail.visible) { // patakhe: fireworks burst up in the sky and fountains of sparks fizz on the floor
+        bursts.forEach((b) => b.sparks.forEach((s, i) => {
+          const phase = (t * 0.5 + b.delay) % 1, a = (i / 16) * PI * 2, radius = phase * 0.95;
+          s.visible = true;
+          s.position.set(b.x + Math.cos(a) * radius, b.y + Math.sin(a) * radius - phase * phase * 0.3, 0.2);
+          s.scale.setScalar(0.05 + 0.16 * (1 - phase));
+          s.material.opacity = amount * (1 - phase);
+        }));
+        fountains.forEach((f) => f.sparks.forEach((s, k) => {
+          const p = (t * 1.3 + k / 12) % 1;
+          s.visible = true;
+          s.position.set(f.x + (k % 5 - 2) * 0.1 * p, 0.12 + 2 * p * (1 - p) * 1.1, 0.35);
+          s.scale.setScalar(0.04 + 0.1 * (1 - p));
+          s.material.opacity = amount * (1 - p);
+        }));
+      }
+
+      if (props.bouquet.visible) { // a crown for the wedding, and rose petals drifting down for the wedding and congratulations
+        weddingCrown.visible = current === "wedding";
+        weddingCrown.scale.setScalar(1.2 * amount);
+        petals.forEach((p) => {
+          if (current === "love") return; // love has his floating hearts instead
+          const { x, z, offset } = p.userData;
+          const fall = (t * 0.3 + offset) % 1;
+          p.visible = true;
+          p.position.set(x + Math.sin(t * 1.6 + offset * 9) * 0.2, 4.3 - fall * 4.2, z);
+          p.rotation.set(t * 2 + offset * 6, t * 1.5 + offset * 3, 0);
+          p.material.opacity = amount * Math.sin(Math.PI * fall);
+        });
+      }
+
+      if (props.cake.visible || props.cocktail.visible) { // the rest of the party: balloons, hat and confetti
         balloons.visible = true;
         balloons.scale.setScalar(amount);
         balloons.children.forEach((bunch) => { bunch.rotation.z = Math.sin(t * 1.3 + bunch.userData.sway) * 0.05; });

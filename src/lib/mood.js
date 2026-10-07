@@ -48,10 +48,16 @@ const INSULT = new RegExp(
 );
 
 // Parties, shopping and food. Mark joins in with cake and balloons, shopping bags, or whatever you are eating.
+const HEARTBREAK = /\b(break ?ups?|broke up|breaking up|broken up|divorces?|divorced|separation|(?:we|they|got|am|are|been) separated|heartbreak|heartbroken|my ex|ex-?(?:girlfriend|boyfriend|wife|husband)|cheated on me|dumped me)\b/i; // a broken heart
+const WORKING = /\b(working (?:on|from|late|hard|today)|work(?:ing)? from home|wfh|at (?:the |my )?office|office|laptop|coding|programming|developers?|typing|emails?|reports?|spreadsheets?|excel)\b/i; // a desk with a laptop
+const MEETING = /\b(meetings?|presentations?|stand-?up|client call|zoom|conference|agenda)\b/i; // a clipboard
+const PROMOTION = /\b(promotion|promoted|salary hike|hike|bonus|new job|job offer|got the job|got hired)\b/i; // proud
+const WEDDING = /\b(wedding|weddings|marriage|marry|married|marrying|shaadi|shadi|bride|bridal|groom|engaged|engagement|honeymoon|newlyweds?|just married)\b/i; // a bouquet and a crown
 const BIRTHDAY = /\b(birthday|b'?day|bday|anniversary|cakes?|many happy returns)\b/i; // cake, candles and a present
-const PARTY = /\b(congrat\w*|celebrat\w*|balloons?|wish you)\b|(?<!third[ -])\bparty\b/i; // balloons, hat and a sparkling drink
+const CONGRATS = /\bcongrat\w*\b/i; // a bouquet
+const PARTY = /\b(celebrat\w*|balloons?|wish you)\b|(?<!third[ -])\bparty\b/i; // a cocktail, a cold drink, fireworks and balloons
 const SHOPPING = /\b(shopping|shopped|mall|groceries|grocery|supermarket|shopping bags?|flipkart|myntra|walmart|big sale|on sale|discounts?|(?:let'?s|going to|gonna|want to|wanna) (?:buy|shop)|i (?:just )?bought)\b/i;
-const FOOD_GESTURES = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea", "popcorn"];
+const FOOD_GESTURES = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea"];
 const pickFood = () => FOOD_GESTURES[Math.floor(Math.random() * FOOD_GESTURES.length)];
 
 // Checked in this order; the first pattern that matches decides. `gesture` is what Mark plays (see
@@ -95,7 +101,13 @@ const USER_RULES = [
   { test: /\b(excited|exciting|can'?t wait|cannot wait|so happy|wow+|amazing news|awesome news)\b/i, gesture: "excited" },
   // a real problem beats the fun topics below: "my pizza app is not working" is a problem first
   { test: /\b(not working|doesn'?t work|won'?t (start|work|turn on|open|load)|broken|error|crash\w*|failed|failure|bug)\b/i, gesture: "sad" },
+  { test: WEDDING, gesture: "wedding" },
+  { test: HEARTBREAK, gesture: "heartbreak" },
+  { test: PROMOTION, gesture: "proud" },
+  { test: MEETING, gesture: "meeting" },
+  { test: WORKING, gesture: "working" },
   { test: BIRTHDAY, gesture: "birthday" },
+  { test: CONGRATS, gesture: "congrats" },
   { test: PARTY, gesture: "party" },
   { test: SHOPPING, gesture: "shopping" },
   { test: /\b(momos?|dumplings?|dim ?sum|gyoza|wontons?|pierogi)\b/i, gesture: "momos" },

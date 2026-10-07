@@ -31,13 +31,13 @@ const FACE_W = 512;
 const FACE_H = 379; // same shape as the visor screen (1.0 x 0.74)
 
 // Colour of the glowing face, and of the antenna bulb / chest light, for each mood.
-const GLOW = { sad: "#9cc5ff", hurt: "#9cc5ff", crying: "#9cc5ff", sleepy: "#9cc5ff", angry: "#ff7b7b", love: "#ff8fb8", namaste: "#ffc36b" }; // every other mood glows cyan
+const GLOW = { heartbreak: "#9cc5ff", sad: "#9cc5ff", hurt: "#9cc5ff", crying: "#9cc5ff", sleepy: "#9cc5ff", angry: "#ff7b7b", love: "#ff8fb8", namaste: "#ffc36b" }; // every other mood glows cyan
 const BULB = {
   neutral: 0x67e8f9, happy: 0x4ade80, sad: 0x94a3b8, thinking: 0xfbbf24, listening: 0xc084fc,
   wave: 0x4ade80, spin: 0x4ade80, dance: 0x4ade80, surprised: 0xfbbf24, delighted: 0x4ade80, grabbed: 0xfbbf24, nod: 0x67e8f9,
   thanks: 0xf472b6,
   hurt: 0x94a3b8, crying: 0x94a3b8, sleepy: 0x94a3b8, angry: 0xef4444, excited: 0xfbbf24, confused: 0xc084fc, scared: 0xfbbf24,
-  clapping: 0x4ade80, cheering: 0x4ade80, love: 0xf472b6, namaste: 0xfb923c, birthday: 0xf472b6, party: 0xc084fc, shopping: 0xfbbf24,
+  clapping: 0x4ade80, cheering: 0x4ade80, love: 0xf472b6, namaste: 0xfb923c, birthday: 0xf472b6, party: 0xc084fc, wedding: 0xf472b6, congrats: 0xf472b6, popcorn: 0xfbbf24, heartbreak: 0x94a3b8, working: 0x38bdf8, meeting: 0x38bdf8, shopping: 0xfbbf24,
 };
 for (const food of FOODS) BULB[food] = 0xfb923c; // orange while he eats
 const bulbFor = (mood) => BULB[mood] ?? BULB.neutral;
@@ -47,8 +47,8 @@ const ALIAS = { running: "thinking", walking: "thinking" };
 const canonical = (mood) => ALIAS[mood] ?? mood;
 
 // Moods whose eyes are drawn as happy "smiling arcs".
-const HAPPY_EYES = ["happy", "dance", "spin", "delighted", "thanks", "namaste", "excited", "cheering", "clapping", "birthday", "party", "shopping", "proud", "magic", "thumbs_up", ...FOODS];
-const BIG_SMILE = ["happy", "dance", "spin", "excited", "cheering", "clapping", "birthday", "party", "shopping"]; // open-mouth smile
+const HAPPY_EYES = ["happy", "dance", "spin", "delighted", "thanks", "namaste", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping", "proud", "magic", "thumbs_up", ...FOODS];
+const BIG_SMILE = ["happy", "dance", "spin", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping"]; // open-mouth smile
 const SPIN_SECONDS = 1.4; // how long the spin gesture takes
 const DANCE_MOVE_SECONDS = 2.4; // each move of the dance routine lasts this long
 const DANCE_SPIN_MOVE = 1; // ...and this move (counting from 0) is a full turn
@@ -529,7 +529,7 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
     const seconds = t - state.moodStart;
 
     if (m === "birthday" || m === "party") {
-      // birthday: a cake with candles in one hand and a present in the other; party: a sparkling drink raised in a toast. Both dance about
+      // birthday: a cake with candles in one hand and a present in the other; party: a cocktail and a cold drink raised in a toast, with fireworks. Both dance about
       const toast = Math.max(0, Math.sin(t * 1.8)) * 0.35; // the glass lifts now and then
       target.bodyY = Math.abs(Math.sin(t * 6)) * 0.07;
       target.headZ = Math.sin(t * 3) * 0.12;
@@ -538,11 +538,75 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.legRx = -Math.sin(t * 6) * 0.25;
       // with the cake and the present he holds both arms out to the sides, so the candles are not hidden behind his head (an arm pointing at the camera cannot be moved sideways)
       const out = m === "birthday";
-      target.armRx = (out ? -0.55 : -1.15) + Math.sin(t * 6) * 0.04;
-      target.armRz = out ? 0.9 : -0.4; // positive = the right arm swings out to the side
-      target.armLx = out ? -0.55 : -1.25 - toast;
-      target.armLz = out ? -0.9 : 0.45; // negative = the left arm swings out to the side
+      target.armRx = (out ? -0.55 : -0.95 - toast * 0.6) + Math.sin(t * 6) * 0.04;
+      target.armRz = out ? 0.9 : 0.55; // positive = the right arm swings out to the side
+      target.armLx = out ? -0.55 : -0.95 - toast;
+      target.armLz = out ? -0.9 : -0.55; // negative = the left arm swings out to the side
       target.stars = 1;
+      target.props = 1;
+    } else if (m === "wedding") {
+      // a slow, happy waltz with a bouquet, one hand on his heart, hearts and rose petals floating down
+      target.bodyY = Math.abs(Math.sin(t * 2)) * 0.05;
+      target.lean = Math.sin(t * 2) * 0.08;
+      target.headZ = Math.sin(t * 2) * 0.1;
+      target.legLx = Math.sin(t * 2) * 0.2;
+      target.legRx = -Math.sin(t * 2) * 0.2;
+      target.armRx = -0.95 + Math.sin(t * 2) * 0.05;
+      target.armRz = 0.35;
+      target.armLx = -1.0;
+      target.armLz = -0.15;
+      target.hearts = 1;
+      target.stars = 0.6;
+      target.props = 1;
+    } else if (m === "congrats") {
+      // congratulations: presenting a bouquet with a happy bounce, the other hand waving, petals and sparkles
+      target.bodyY = Math.abs(Math.sin(t * 5)) * 0.07;
+      target.headZ = Math.sin(t * 2.5) * 0.1;
+      target.armRx = -1.3;
+      target.armRz = 0.4;
+      target.armLx = -1.0 + Math.sin(t * 10) * 0.15;
+      target.armLz = -0.5;
+      target.stars = 1;
+      target.props = 1;
+    } else if (m === "popcorn") {
+      // tossing popcorn about: the bucket held high, a happy bounce, the other hand sweeping, popcorn flying everywhere
+      const bounce = Math.abs(Math.sin(t * 5));
+      target.bodyY = bounce * 0.06;
+      target.armRx = -1.5 - Math.max(0, Math.sin(t * 5)) * 0.35;
+      target.armRz = 0.55;
+      target.armLx = -1.1 + Math.sin(t * 5 + 1) * 0.3;
+      target.armLz = -0.7;
+      target.headZ = Math.sin(t * 2.5) * 0.1;
+      target.stars = 0.8;
+      target.props = 1;
+    } else if (m === "heartbreak") {
+      // a break-up: head hanging, shoulders low, the broken heart held against his chest, slowly shaking his head
+      target.headX = 0.5;
+      target.headY = Math.sin(t * 1.2) * 0.25;
+      target.lean = 0.08;
+      target.armRx = -0.95;
+      target.armRz = 0.2;
+      target.armLx = -0.7;
+      target.armLz = -0.15;
+      target.props = 1;
+    } else if (m === "working") {
+      // typing at the laptop: head tipped down at the screen, both hands tapping away
+      const tap = Math.sin(t * 14);
+      target.headX = 0.28 + Math.sin(t * 1.3) * 0.03; // head tipped down at the screen
+      target.armRx = -1.0 + tap * 0.12;
+      target.armLx = -1.0 - tap * 0.12;
+      target.armRz = 0.2;
+      target.armLz = -0.2;
+      target.lean = 0.04;
+      target.props = 1;
+    } else if (m === "meeting") {
+      // presenting in a meeting: clipboard in one hand, the other hand gesturing, nodding along
+      target.headX = Math.sin(t * 2.2) * 0.1;
+      target.headZ = Math.sin(t * 1.1) * 0.05;
+      target.armRx = -1.05;
+      target.armRz = 0.25;
+      target.armLx = -0.9 + Math.sin(t * 3) * 0.35;
+      target.armLz = -0.55;
       target.props = 1;
     } else if (m === "shopping") {
       // strolling happily with a shopping bag in each hand
@@ -629,6 +693,7 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.lean = Math.sin(t * 2) * 0.05;
       target.bodyY = Math.abs(Math.sin(t * 3)) * 0.04;
       target.hearts = 1;
+      target.props = 1; // a bouquet of flowers in his hand
     } else if (m === "sleepy") {
       // slowly nodding off, arms hanging, "zzz" on the visor
       target.headX = 0.35 + Math.sin(t * 0.9) * 0.12;
@@ -774,7 +839,7 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
     model.rotation.set(pose.lean, pose.yaw + spin, 0);
     model.scale.set(1 / Math.sqrt(pose.squash), pose.squash, 1 / Math.sqrt(pose.squash));
 
-    head.rotation.set(pose.headX + state.lookY * 0.28, state.lookX * 0.55 + pose.headY, pose.headZ);
+    head.rotation.set(pose.headX + (state.mood === "working" ? 0 : state.lookY) * 0.28, state.lookX * 0.55 + pose.headY, pose.headZ);
     arms[0].rotation.set(pose.armLx, 0, pose.armLz);
     arms[1].rotation.set(pose.armRx, 0, pose.armRz);
     legs[0].rotation.set(pose.legLx, 0, pose.legLz);
@@ -836,7 +901,7 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
 
     // while bowing, the visor shows the written greeting (Korean "thank you" or Hindi "namaste") for as long as he is bowed
     const greeting = state.mood === "thanks" || state.mood === "namaste" ? bowAmount(t - state.moodStart) : 0;
-    drawFace(faceContext, state.mood, t, state.lookX, state.lookY, state.speaking || state.eating || state.talking, greeting, state.mood === "namaste" ? "नमस्ते" : "감사합니다");
+    drawFace(faceContext, state.mood, t, state.mood === "working" ? 0 : state.lookX, state.mood === "working" ? 0.9 : state.lookY, state.speaking || state.eating || state.talking, greeting, state.mood === "namaste" ? "नमस्ते" : "감사합니다");
     faceTexture.needsUpdate = true;
   }
 
@@ -937,7 +1002,7 @@ function drawFace(ctx, mood, t, lookX, lookY, speaking, thanksText = 0, greeting
   const w = FACE_W;
   const h = FACE_H;
   const color = GLOW[mood] ?? "#7ff0ff";
-  const sadLike = mood === "sad" || mood === "hurt" || mood === "crying"; // worried brows, small frown
+  const sadLike = mood === "sad" || mood === "hurt" || mood === "crying" || mood === "heartbreak"; // worried brows, small frown
   ctx.clearRect(0, 0, w, h);
   ctx.save();
   ctx.fillStyle = color;
@@ -1062,6 +1127,12 @@ function drawFace(ctx, mood, t, lookX, lookY, speaking, thanksText = 0, greeting
     ctx.font = `${Math.round(w * 0.17)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
     ctx.textAlign = "center";
     ctx.fillText("😋", w * 0.84, h * 0.24 + Math.sin(t * 6) * h * 0.02);
+  }
+  if (mood === "popcorn" || mood === "heartbreak") {
+    // 🍿 for the popcorn toss, 💔 for a break-up
+    ctx.font = `${Math.round(w * 0.17)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText(mood === "popcorn" ? "🍿" : "💔", w * 0.84, h * 0.24 + Math.sin(t * (mood === "popcorn" ? 6 : 2)) * h * 0.02);
   }
   if (mood === "confused") {
     // a question mark that bobs above one eye

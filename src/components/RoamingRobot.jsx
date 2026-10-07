@@ -47,6 +47,7 @@ const GESTURE_MS = {
   scared: 2600, crying: 3400, birthday: 5600, shopping: 4400, explain: 3400, shrug: 2200,
   thumbs_up: 2400, point: 2200, shake_head: 2000, stretch: 3000, peek: 2800, hide: 2800, magic: 3400, sit: 3000,
   bow: 3200, proud: 2800, curious: 2800,
+  party: 6400, wedding: 6400, congrats: 5200, popcorn: 5600, heartbreak: 5000, working: 7500, meeting: 5200, // the new party, wedding and office looks need a while to show
   pizza: 4600, burger: 4600, icecream: 4600, donut: 4600, coffee: 4600, fries: 4600, noodles: 4600, tteokbokki: 4600, veggies: 4600, fruits: 4600, momos: 4600, sweets: 4600, chocolate: 4600, chips: 4600, tea: 4600,
 };
 const CLICK_GESTURES = ["happy", "wave", "spin", "dance", "surprised"];
