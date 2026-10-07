@@ -91,7 +91,7 @@ const USER_RULES = [
   { test: request("talk|speak|say something|explain|tell me about yourself"), gesture: "explain" },
   { test: /\b(thanks|thank you|thank u|thx|cheers|appreciate (it|that|your help))\b/i, gesture: "thanks" }, // the polite Korean bow, with 감사합니다
   // love: "i love you", hearts, kisses (before the compliments, which would only make him giggle)
-  { test: /\b(?:i )?love you\b|\bmy love\b|\bxoxo\b|\bkiss(?:es)?\b|❤|♥|😍|🥰|😘/i, gesture: "love" },
+  { test: /\b(?:i )?(?:love|luv) (?:you|u|ya|it|this|that|him|her|mark|robo)\b|\bmy love\b|\bin love\b|\bvalentines?\b|\bromantic\b|\bromance\b|\bcrush\b|\bxoxo\b|\bkiss(?:es)?\b|^\W*(?:love|luv)\W*$|❤|♥|😍|🥰|😘/i, gesture: "love" }, // love: flowers for you
   // compliments: "you are so cute", "you look lovely", "cutie", "good job"
   { test: COMPLIMENT, gesture: "delighted" },
   { test: /^(?:\W|\w+\W+){0,4}?(?:cute+|cutest|cutie|adorable|aw+w*)\b(?:\W+\w+){0,3}\W*$/i, gesture: "delighted" }, // short and cute: "cute", "cute robo", "awww cute"

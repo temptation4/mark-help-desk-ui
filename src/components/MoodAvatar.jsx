@@ -37,7 +37,7 @@ const LABEL = {
   cheering: "is cheering",
   delighted: "is giggling",
   birthday: "is celebrating a birthday: a cake with lit candles, a present, balloons and a party hat",
-  party: "is at a party with a cocktail and a cold drink, balloons, sparkles and fireworks",
+  party: "is at a party with a cocktail, sparkles and fireworks, one arm waving in the air",
   heartbreak: "is heartbroken after a break-up, holding a broken heart, head hanging",
   popcorn: "is tossing popcorn all around, the bucket held high",
   working: "is working hard at a laptop on his desk, typing away with a mug of coffee",

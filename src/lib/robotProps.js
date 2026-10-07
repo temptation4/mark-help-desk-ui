@@ -657,43 +657,112 @@ function cocktail(glowTexture) {
   return g;
 }
 
-/** A cold drink: dark cola with ice cubes, a striped straw and a lemon slice in a tall glass, bubbles rising. */
-function coldDrink() {
+/**
+ * A rose: a spiral of overlapping, cupped petals, the outer ones folding outwards, on a green calyx. `color` is the petal colour;
+ * the outer petals are a little darker and the heart a little lighter, as on a real rose. About 0.2 wide.
+ */
+function rose(color) {
   const g = new THREE.Group();
-  part(g, new THREE.CylinderGeometry(0.105, 0.085, 0.36, 24, 1, true), clearGlass(), 0, 0.18); // the glass
-  part(g, new THREE.CylinderGeometry(0.098, 0.082, 0.3, 24), paint(0x4a2511, 0.15), 0, 0.155); // the cola
-  part(g, new THREE.CylinderGeometry(0.1, 0.1, 0.012, 24), paint(0xe9d5b5, 0.4), 0, 0.31); // the foam on top
-  [[-0.04, 0.04], [0.04, -0.02], [0, -0.05]].forEach(([x, z], i) => { // ice cubes
-    const ice = part(g, new THREE.BoxGeometry(0.07, 0.07, 0.07), new THREE.MeshPhysicalMaterial({ color: 0xcfeeff, transparent: true, opacity: 0.8, roughness: 0.1 }), x, 0.33 + i * 0.012, z);
-    ice.rotation.set(0.4 + i, 0.5 * i, 0.3);
-  });
-  const straw = part(g, new THREE.CylinderGeometry(0.011, 0.011, 0.34, 8), paint(0xe03a3a, 0.4), 0.05, 0.27);
-  straw.rotation.z = -0.22;
-  const strawBend = part(g, new THREE.CylinderGeometry(0.011, 0.011, 0.08, 8), paint(0xffffff, 0.4), 0.115, 0.43);
-  strawBend.rotation.z = PI / 2 - 0.5;
-  lemonWheel(g, 0.105, 0.34);
-  g.userData.bubbles = [0, 1, 2, 3, 4].map((i) => part(g, new THREE.SphereGeometry(0.012, 8, 6), paint(0xffffff, 0.2), (i - 2) * 0.03, 0.1, ((i * 7) % 5 - 2) * 0.02));
+  const base = new THREE.Color(color);
+  for (let i = 0; i < 16; i++) {
+    const shade = base.clone().multiplyScalar(0.82 + (1 - i / 15) * 0.2).lerp(new THREE.Color(0xffffff), (i < 5 ? 0.18 : 0) + (i < 2 ? 0.1 : 0));
+    const a = i * 2.4, ring = 0.012 + i * 0.0062;
+    const petal = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 12, 8, 0, PI * 2, 0, PI * 0.62), // a cup, open at the top
+      new THREE.MeshStandardMaterial({ color: shade, roughness: 0.45, side: THREE.DoubleSide }),
+    );
+    const size = 0.034 + i * 0.0036;
+    petal.scale.set(size, size * 0.9, size * 0.55);
+    petal.position.set(Math.cos(a) * ring, 0.095 - i * 0.0045, Math.sin(a) * ring);
+    petal.rotation.set(0, -a, -(0.15 + i * 0.075)); // later petals lean further out
+    g.add(petal);
+  }
+  const sepal = paint(0x3f8f46, 0.6);
+  for (let i = 0; i < 5; i++) { // the green calyx under the flower
+    const a = (i / 5) * PI * 2;
+    const leaf = part(g, new THREE.ConeGeometry(0.02, 0.09, 6), sepal, Math.cos(a) * 0.05, 0.02, Math.sin(a) * 0.05);
+    leaf.rotation.set(Math.sin(a) * 1.0, 0, -Math.cos(a) * 1.0);
+  }
   return g;
 }
 
-/** A bridal bouquet: roses and little white flowers in a white paper cone, tied with a pink ribbon. */
+/** A daisy: a ring of white petals round a yellow heart. About 0.2 wide. */
+function daisy() {
+  const g = new THREE.Group();
+  const white = paint(0xffffff, 0.5);
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * PI * 2;
+    const petal = part(g, new THREE.SphereGeometry(1, 8, 6), white, Math.cos(a) * 0.065, 0.0, Math.sin(a) * 0.065);
+    petal.scale.set(0.05, 0.008, 0.016);
+    petal.rotation.y = -a;
+  }
+  part(g, new THREE.SphereGeometry(0.035, 12, 8), paint(0xffc400, 0.6), 0, 0.008, 0);
+  return g;
+}
+
+/** A leaf: a long pointed green blade with a lighter middle vein. */
+function leafBlade() {
+  const g = new THREE.Group();
+  const blade = part(g, new THREE.SphereGeometry(1, 10, 6), paint(0x2f7d3a, 0.55), 0, 0, 0.1);
+  blade.scale.set(0.05, 0.01, 0.13);
+  const vein = part(g, new THREE.BoxGeometry(0.004, 0.004, 0.2), paint(0x6bbf6f, 0.6), 0, 0.01, 0.1);
+  vein.scale.y = 1;
+  return g;
+}
+
+/**
+ * A bridal bouquet: pink, red, peach and white roses with a few daisies, green leaves and baby's breath, wrapped in two layers of paper
+ * (kraft outside, pink inside) with a ribbon bow at the neck. The hand holds it at the neck, and the flowers dome up from there.
+ */
 function bouquet() {
   const g = new THREE.Group();
-  part(g, new THREE.CylinderGeometry(0.012, 0.012, 0.3, 8), paint(0x3f9d4b), 0, 0.1); // stems
-  part(g, new THREE.ConeGeometry(0.12, 0.3, 14, 1, true), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, side: THREE.DoubleSide }), 0, 0.22).rotation.x = PI; // the paper
-  const ribbon = part(g, new THREE.TorusGeometry(0.045, 0.012, 8, 16), paint(0xff6fa5, 0.4), 0, 0.16);
-  ribbon.rotation.x = PI / 2;
-  const roses = [0xff4d6d, 0xff9fb8, 0xffffff, 0xff6fa5, 0xffc2d4, 0xff4d6d, 0xffffff];
-  roses.forEach((color, i) => {
-    const a = i * 2.2, r = i === 0 ? 0 : 0.1;
-    const x = Math.cos(a) * r, z = Math.sin(a) * r, y = 0.4 + (i === 0 ? 0.06 : 0.01 * (i % 3));
-    part(g, new THREE.SphereGeometry(0.075, 14, 10), paint(color, 0.45), x, y, z);
-    const inner = part(g, new THREE.TorusGeometry(0.045, 0.014, 6, 12), paint(color, 0.5), x, y + 0.045, z); // petals curling in the middle
-    inner.rotation.x = PI / 2;
+  // the stems, bound together, and the paper wrap that flares out round them
+  part(g, new THREE.CylinderGeometry(0.02, 0.016, 0.36, 10), paint(0x3f8f46, 0.6), 0, 0.0, 0);
+  const wrapOuter = part(g, new THREE.ConeGeometry(0.2, 0.36, 18, 1, true), new THREE.MeshStandardMaterial({ color: 0xe8d4b0, roughness: 0.7, side: THREE.DoubleSide }), 0, 0.2, 0);
+  wrapOuter.rotation.x = PI;
+  const wrapInner = part(g, new THREE.ConeGeometry(0.17, 0.3, 18, 1, true), new THREE.MeshStandardMaterial({ color: 0xffb3c7, roughness: 0.6, side: THREE.DoubleSide }), 0, 0.22, 0.012);
+  wrapInner.rotation.x = PI;
+  // the ribbon bow at the neck: a knot, two loops and two tails
+  const ribbon = paint(0xff5f93, 0.35);
+  part(g, new THREE.SphereGeometry(0.03, 12, 8), ribbon, 0, 0.115, 0.07);
+  [-1, 1].forEach((side) => {
+    const loop = part(g, new THREE.TorusGeometry(0.045, 0.012, 8, 16), ribbon, side * 0.055, 0.125, 0.075);
+    loop.rotation.set(0, 0.5 * side, side * 0.5);
+    const tail = part(g, new THREE.BoxGeometry(0.025, 0.12, 0.006), ribbon, side * 0.03, 0.04, 0.085);
+    tail.rotation.z = side * 0.25;
   });
-  for (let i = 0; i < 9; i++) { // baby's breath
-    const a = i * 1.7;
-    part(g, new THREE.SphereGeometry(0.018, 6, 5), paint(0xffffff, 0.6), Math.cos(a) * 0.17, 0.38 + (i % 3) * 0.04, Math.sin(a) * 0.15);
+  // leaves fanning out round the edge of the flowers
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * PI * 2 + 0.3;
+    const leaf = leafBlade();
+    leaf.position.set(Math.cos(a) * 0.1, 0.4 + (i % 2) * 0.03, Math.sin(a) * 0.1);
+    leaf.rotation.set(-0.5, -a + PI / 2, 0);
+    g.add(leaf);
+  }
+  // the flowers: one rose in the middle on top, a ring of roses round it, daisies and baby's breath between
+  const roseColors = [0xe0314f, 0xff7fa0, 0xffffff, 0xf9a8b8, 0xd62e5e, 0xffc9b5, 0xff6b8f];
+  const spots = [[0, 0.58, 0]];
+  for (let i = 0; i < 6; i++) { const a = (i / 6) * PI * 2 + 0.4; spots.push([Math.cos(a) * 0.16, 0.5 - (i % 2) * 0.02, Math.sin(a) * 0.14]); }
+  spots.forEach(([x, y, z], i) => {
+    const flower = rose(roseColors[i % roseColors.length]);
+    flower.position.set(x, y, z);
+    flower.rotation.set(Math.sin(i * 2.1) * 0.25 + (z * 1.2), i, -x * 1.4); // tilted out from the middle
+    g.add(flower);
+    const stem = part(g, new THREE.CylinderGeometry(0.008, 0.008, Math.hypot(x, y - 0.1, z), 6), paint(0x3f8f46, 0.6), x / 2, 0.1 + (y - 0.1) / 2, z / 2);
+    stem.lookAt(new THREE.Vector3(x, y, z).add(g.position));
+    stem.rotateX(PI / 2);
+  });
+  for (let i = 0; i < 4; i++) { // daisies
+    const a = (i / 4) * PI * 2 + 1.0;
+    const flower = daisy();
+    flower.position.set(Math.cos(a) * 0.24, 0.42 + (i % 2) * 0.03, Math.sin(a) * 0.2);
+    flower.rotation.set(0.5 * Math.sin(a), 0, -0.6 * Math.cos(a));
+    g.add(flower);
+  }
+  for (let i = 0; i < 12; i++) { // baby's breath: tiny white flowers on thin stalks
+    const a = i * 2.1;
+    const x = Math.cos(a) * 0.3, y = 0.46 + (i % 3) * 0.04, z = Math.sin(a) * 0.24;
+    for (let k = 0; k < 3; k++) part(g, new THREE.SphereGeometry(0.014, 6, 5), paint(0xffffff, 0.6), x + (k - 1) * 0.02, y + (k % 2) * 0.02, z);
   }
   return g;
 }
@@ -748,7 +817,7 @@ function partyHat() {
 }
 
 // how much to enlarge each prop when he holds it (1 = as built)
-const SIZE = { cake: 1.9, gift: 1.5, cocktail: 1.9, colddrink: 1.8, bouquet: 2.0, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.1, tea: 2.1 };
+const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.1, tea: 2.1 };
 
 const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
 
@@ -760,7 +829,7 @@ const WORKING = []; // "holding" for the working gesture: nothing in his hands (
 
 function holdingFor(mood, props) {
   if (mood === "birthday") return [[1, props.cake, true], [0, props.gift, true]]; // a cake with candles, and a present
-  if (mood === "party") return [[0, props.cocktail, true], [1, props.colddrink, true]]; // a cocktail and a cold drink
+  if (mood === "party") return [[0, props.cocktail, true]]; // one cocktail
   if (mood === "wedding" || mood === "love" || mood === "congrats") return [[1, props.bouquet, true]]; // flowers for love, marriage and congratulations
   if (mood === "meeting") return [[1, props.clipboard, true]];
   if (mood === "popcorn") return [[1, props.popcorn, true]]; // held up high, popcorn flying out of it
@@ -787,12 +856,12 @@ export function createProps(scene, arms, glowTexture, head) {
     return hand;
   });
 
-  const props = { cake: cake(glowTexture), gift: gift(), cocktail: cocktail(glowTexture), colddrink: coldDrink(), bouquet: bouquet(), clipboard: clipboard(), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
+  const props = { cake: cake(glowTexture), gift: gift(), cocktail: cocktail(glowTexture), bouquet: bouquet(), clipboard: clipboard(), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
   for (const name of FOODS) props[name] = BUILDERS[name](glowTexture);
   props.popcorn = popcorn();
   props.brokenheart = brokenHeart();
   Object.entries(props).forEach(([kind, p]) => { p.userData.kind = kind; p.visible = false; });
-  hands[1].add(props.popcorn, props.brokenheart, props.clipboard, props.colddrink, props.bouquet, props.cake, props.bagR, ...FOODS.map((name) => props[name]));
+  hands[1].add(props.popcorn, props.brokenheart, props.clipboard, props.bouquet, props.cake, props.bagR, ...FOODS.map((name) => props[name]));
   hands[0].add(props.cocktail, props.gift, props.bagL);
 
   // the rest of the party: balloons either side of him, and a hat
@@ -905,9 +974,6 @@ export function createProps(scene, arms, glowTexture, head) {
           puff.material.opacity = amount * 0.85 * Math.sin(Math.PI * phase);
         });
       });
-      props.colddrink.userData.bubbles.forEach((bubble, i) => {
-        bubble.position.y = 0.06 + ((t * 0.5 + i * 0.2) % 1) * 0.24;
-      });
       props.cocktail.userData.sparks.forEach((spark, i) => {
         const twinkle = 0.5 + 0.5 * Math.sin(t * 7 + i * 2);
         spark.position.set(Math.cos(t * 1.5 + i * 1.6) * 0.2, 0.62 + (i % 2) * 0.1, Math.sin(t * 1.5 + i * 1.6) * 0.1);
@@ -977,7 +1043,7 @@ export function createProps(scene, arms, glowTexture, head) {
         });
       }
 
-      if (props.cake.visible || props.cocktail.visible) { // the rest of the party: balloons, hat and confetti
+      if (props.cake.visible) { // the rest of the birthday: balloons, hat and confetti
         balloons.visible = true;
         balloons.scale.setScalar(amount);
         balloons.children.forEach((bunch) => { bunch.rotation.z = Math.sin(t * 1.3 + bunch.userData.sway) * 0.05; });

@@ -29,7 +29,7 @@ const CHAT_REPLIES = [
   [/\b(meeting|presentation|standup|zoom)\b/i, "Meeting time! 📋 I brought my clipboard. In the real app I answer with an AI model; here I only have a few canned lines."],
   [/\b(wedding|marriage|married|marry|bride|shaadi)\b/i, "Congratulations! 💍 I brought the bouquet and a crown. The real app answers with an AI model; here I only have a few canned lines."],
   [/\b(congrat\w*)\b/i, "Congratulations! 💐 These flowers are for you. The real app answers with an AI model; here I only have a few canned lines."],
-  [/\b(party|celebrate)\b/i, "Party time! 🎉 Cocktails, cold drinks and fireworks. In the real app I would also chat about the plan."],
+  [/\b(party|celebrate)\b/i, "Party time! 🎉 A cocktail, sparkles and fireworks. In the real app I would also chat about the plan."],
   [/\b(birthday)\b/i, "Happy birthday! 🎂 I brought the cake. In the real app I would also chat about your day."],
   [/\b(pizza|burger|food|hungry|noodles|coffee)\b/i, "Yum! I love props. The real app answers with an AI model, here I only have a few canned lines."],
 ];

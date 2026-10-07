@@ -529,7 +529,7 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
     const seconds = t - state.moodStart;
 
     if (m === "birthday" || m === "party") {
-      // birthday: a cake with candles in one hand and a present in the other; party: a cocktail and a cold drink raised in a toast, with fireworks. Both dance about
+      // birthday: a cake with candles in one hand and a present in the other; party: a cocktail raised in a toast, one arm waving in the air, with sparkles and fireworks. Both dance about
       const toast = Math.max(0, Math.sin(t * 1.8)) * 0.35; // the glass lifts now and then
       target.bodyY = Math.abs(Math.sin(t * 6)) * 0.07;
       target.headZ = Math.sin(t * 3) * 0.12;
@@ -538,8 +538,8 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.legRx = -Math.sin(t * 6) * 0.25;
       // with the cake and the present he holds both arms out to the sides, so the candles are not hidden behind his head (an arm pointing at the camera cannot be moved sideways)
       const out = m === "birthday";
-      target.armRx = (out ? -0.55 : -0.95 - toast * 0.6) + Math.sin(t * 6) * 0.04;
-      target.armRz = out ? 0.9 : 0.55; // positive = the right arm swings out to the side
+      target.armRx = out ? -0.55 + Math.sin(t * 6) * 0.04 : 0.1; // at a party the free arm is up in the air, waving
+      target.armRz = out ? 0.9 : 2.2 + Math.sin(t * 6) * 0.3; // positive = the right arm swings out to the side
       target.armLx = out ? -0.55 : -0.95 - toast;
       target.armLz = out ? -0.9 : -0.55; // negative = the left arm swings out to the side
       target.stars = 1;
@@ -685,10 +685,11 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.headZ = Math.sin(t * 3.5) * 0.08;
       target.stars = 0.5;
     } else if (m === "love") {
-      // hands on his heart, swaying, hearts floating up, heart-shaped eyes
-      target.armLx = target.armRx = -0.9;
-      target.armLz = 0.5;
-      target.armRz = -0.5;
+      // one hand on his heart, the other holding out a bouquet to you; swaying, hearts floating up, heart-shaped eyes
+      target.armRx = -1.25;
+      target.armRz = 0.45;
+      target.armLx = -0.9;
+      target.armLz = -0.5;
       target.headZ = Math.sin(t * 2) * 0.15;
       target.lean = Math.sin(t * 2) * 0.05;
       target.bodyY = Math.abs(Math.sin(t * 3)) * 0.04;
