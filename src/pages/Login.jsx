@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import MoodAvatar from "../components/MoodAvatar";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
@@ -7,7 +7,8 @@ import { Card, CardContent } from "../components/ui/card";
 import { Spinner } from "../components/ui/spinner";
 import { isLoggedIn } from "../lib/auth";
 import { DEMO } from "../lib/demo";
-import { login, register } from "../services/auth.service";
+import GoogleSignInButton from "../components/GoogleSignInButton";
+import { login, loginWithGoogle, register } from "../services/auth.service";
 
 /** One page for both "Sign in" and "Create account"; a link underneath switches between them. */
 function Login() {
@@ -21,6 +22,19 @@ function Login() {
   const [submitting, setSubmitting] = useState(false);
 
   const isRegister = mode === "register";
+
+  // Google gave the browser an ID token: the auth service checks it and signs the user in (or creates their account).
+  const handleGoogle = useCallback(async (credential) => {
+    setError("");
+    setSubmitting(true);
+    try {
+      await loginWithGoogle(credential);
+      navigate(location.state?.from || "/", { replace: true });
+    } catch (err) {
+      setError(err.message);
+      setSubmitting(false);
+    }
+  }, [navigate, location.state]);
 
   // Already signed in: no reason to show the form.
   if (isLoggedIn()) {
@@ -52,7 +66,7 @@ function Login() {
       {/* happy to see you, and sad when the sign-in is refused */}
       <MoodAvatar mood={error ? "sad" : "happy"} size={140} />
       <h1 className="text-3xl font-bold">Help Desk System</h1>
-      {DEMO && <p className="-mt-3 text-sm text-muted-foreground">This is a demo: sign in with any email and password.</p>}
+      {DEMO && <p className="-mt-3 text-sm text-muted-foreground">This is a demo: sign in with any email and password, or with the demo Google button.</p>}
 
       <Card className="w-full max-w-sm">
         <CardContent>
@@ -102,6 +116,12 @@ function Login() {
             <Button type="submit" disabled={submitting} className="cursor-pointer">
               {submitting ? <Spinner /> : isRegister ? "Create account" : "Sign in"}
             </Button>
+
+            <div className="flex items-center gap-3 text-xs text-muted-foreground" aria-hidden="true">
+              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+            </div>
+
+            <GoogleSignInButton onCredential={handleGoogle} onError={setError} />
 
             <p className="text-sm text-muted-foreground text-center">
               {isRegister ? "Already have an account?" : "New here?"}{" "}

@@ -108,6 +108,10 @@ auth-service  ----- signs JWTs ----->  help-desk (Spring Boot + Spring AI)
 - **Honest agents**: replies list the tools the model actually called, and the reply guard throws away answers that mention a ticket that does not exist.
 - Voice: speech-to-text and text-to-speech are optional extras in the backend.
 
+## Sign in
+
+The sign-in page offers **email and password** and **Continue with Google** (OAuth2 / OpenID Connect). The Google button uses Google's own sign-in; the backend checks Google's signed ID token against Google's public keys before it signs you in, so the UI never handles a Google password or secret. It appears active when the auth service has a Google client id (the UI reads it from `/api/v1/auth/config`), and is shown switched off with a note when it does not. The hosted demo has a demo version of the button.
+
 ## Run the UI
 
 ```bash
