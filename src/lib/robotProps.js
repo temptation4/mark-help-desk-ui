@@ -101,10 +101,10 @@ function donut() {
 }
 
 /** Steam: soft grey puffs that rise from the top of hot food. update() animates them. */
-function addSteam(group, glowTexture, y, count = 3, rise = 0.5) {
+function addSteam(group, glowTexture, y, count = 3, rise = 0.5, color = 0x8296ad, size = 1) {
   group.userData.steam = Array.from({ length: count }, (_, i) => {
-    const puff = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture, color: 0x8296ad, transparent: true, depthWrite: false, opacity: 0 }));
-    puff.userData = { x: (i - (count - 1) / 2) * (0.3 / count), baseY: y, phase: i / count, rise };
+    const puff = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture, color, transparent: true, depthWrite: false, opacity: 0 }));
+    puff.userData = { x: (i - (count - 1) / 2) * (0.3 / count), baseY: y, phase: i / count, rise, size };
     group.add(puff);
     return puff;
   });
@@ -127,7 +127,50 @@ function cupAndSaucer(glowTexture, color, drink, rim) {
   return g;
 }
 
-const coffee = (glowTexture) => cupAndSaucer(glowTexture, 0x3b82c4, 0x3b2314, 0xffffff); // blue cup of dark coffee
+/** The top of a latte: brown coffee with a milky heart, drawn on a canvas. */
+function latteArt() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  const coffee = ctx.createRadialGradient(64, 64, 6, 64, 64, 64);
+  coffee.addColorStop(0, "#8a5a33");
+  coffee.addColorStop(1, "#3f2412");
+  ctx.fillStyle = coffee;
+  ctx.fillRect(0, 0, 128, 128);
+  ctx.fillStyle = "#f3e1c8"; // the milk heart
+  ctx.beginPath();
+  ctx.moveTo(64, 96);
+  ctx.bezierCurveTo(26, 68, 34, 34, 64, 54);
+  ctx.bezierCurveTo(94, 34, 102, 68, 64, 96);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(243,225,200,0.55)"; // a few ripples round it
+  ctx.lineWidth = 3;
+  [38, 50].forEach((r) => { ctx.beginPath(); ctx.arc(64, 64, r + 18, 0, Math.PI * 2); ctx.stroke(); });
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+/** A chunky white coffee mug with a red band and a handle, full of latte with a heart on top, and plenty of steam. */
+function coffeeMug(glowTexture) {
+  const g = new THREE.Group();
+  const ceramic = new THREE.MeshStandardMaterial({ color: 0xfaf7f0, roughness: 0.25, side: THREE.DoubleSide });
+  part(g, new THREE.CylinderGeometry(0.12, 0.105, 0.22, 32, 1, true), ceramic, 0, 0.11); // the body
+  part(g, new THREE.CylinderGeometry(0.105, 0.105, 0.015, 32), ceramic, 0, 0.008); // the bottom
+  const rim = part(g, new THREE.TorusGeometry(0.12, 0.012, 8, 32), ceramic, 0, 0.22);
+  rim.rotation.x = PI / 2;
+  part(g, new THREE.CylinderGeometry(0.1175, 0.1142, 0.05, 32, 1, true), new THREE.MeshStandardMaterial({ color: 0xd9381e, roughness: 0.3, side: THREE.DoubleSide }), 0, 0.13); // the red band
+  const top = part(g, new THREE.CircleGeometry(0.108, 32), new THREE.MeshStandardMaterial({ map: latteArt(), roughness: 0.2 }), 0, 0.195);
+  top.rotation.x = -PI / 2;
+  const handle = part(g, new THREE.TorusGeometry(0.065, 0.017, 10, 20, PI), ceramic, 0.115, 0.12);
+  handle.rotation.z = -PI / 2;
+  handle.scale.set(1.15, 0.9, 1);
+  addSteam(g, glowTexture, 0.27, 7, 0.75, 0xc9d3de, 0.9); // small curling wisps rising from the cup: it is hot
+  return g;
+}
+
+const coffee = coffeeMug; // a big mug of latte (tea keeps the cup and saucer)
 const tea = (glowTexture) => cupAndSaucer(glowTexture, 0xffc2d4, 0xc77d2a, 0xf5c542); // pink teacup of amber tea
 
 function fries() {
@@ -714,7 +757,7 @@ function leafBlade() {
  * A bridal bouquet: pink, red, peach and white roses with a few daisies, green leaves and baby's breath, wrapped in two layers of paper
  * (kraft outside, pink inside) with a ribbon bow at the neck. The hand holds it at the neck, and the flowers dome up from there.
  */
-function bouquet() {
+function bouquet(roseColors = [0xe0314f, 0xff7fa0, 0xffffff, 0xf9a8b8, 0xd62e5e, 0xffc9b5, 0xff6b8f], daisies = true) {
   const g = new THREE.Group();
   // the stems, bound together, and the paper wrap that flares out round them
   part(g, new THREE.CylinderGeometry(0.02, 0.016, 0.36, 10), paint(0x3f8f46, 0.6), 0, 0.0, 0);
@@ -740,7 +783,6 @@ function bouquet() {
     g.add(leaf);
   }
   // the flowers: one rose in the middle on top, a ring of roses round it, daisies and baby's breath between
-  const roseColors = [0xe0314f, 0xff7fa0, 0xffffff, 0xf9a8b8, 0xd62e5e, 0xffc9b5, 0xff6b8f];
   const spots = [[0, 0.58, 0]];
   for (let i = 0; i < 6; i++) { const a = (i / 6) * PI * 2 + 0.4; spots.push([Math.cos(a) * 0.16, 0.5 - (i % 2) * 0.02, Math.sin(a) * 0.14]); }
   spots.forEach(([x, y, z], i) => {
@@ -752,9 +794,10 @@ function bouquet() {
     stem.lookAt(new THREE.Vector3(x, y, z).add(g.position));
     stem.rotateX(PI / 2);
   });
-  for (let i = 0; i < 4; i++) { // daisies
+  for (let i = 0; i < 4; i++) { // daisies (the red bouquets have four more roses here instead)
     const a = (i / 4) * PI * 2 + 1.0;
-    const flower = daisy();
+    const flower = daisies ? daisy() : rose(roseColors[(i + 2) % roseColors.length]);
+    if (!daisies) flower.scale.setScalar(0.8);
     flower.position.set(Math.cos(a) * 0.24, 0.42 + (i % 2) * 0.03, Math.sin(a) * 0.2);
     flower.rotation.set(0.5 * Math.sin(a), 0, -0.6 * Math.cos(a));
     g.add(flower);
@@ -817,7 +860,9 @@ function partyHat() {
 }
 
 // how much to enlarge each prop when he holds it (1 = as built)
-const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.1, tea: 2.1 };
+const RED_ROSES = [0xc8102e, 0xd62839, 0xe0314f, 0xb3122b, 0xcf1f3a, 0xe63950, 0x9f1239]; // deep reds, for the love and wedding bouquets
+
+const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1 };
 
 const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
 
@@ -830,14 +875,15 @@ const WORKING = []; // "holding" for the working gesture: nothing in his hands (
 function holdingFor(mood, props) {
   if (mood === "birthday") return [[1, props.cake, true], [0, props.gift, true]]; // a cake with candles, and a present
   if (mood === "party") return [[0, props.cocktail, true]]; // one cocktail
-  if (mood === "wedding" || mood === "congrats") return [[1, props.bouquet, true]]; // flowers for marriage and congratulations
+  if (mood === "wedding") return [[1, props.bouquet, true]]; // red roses for the wedding
+  if (mood === "congrats") return [[1, props.bouquetMix, true]]; // a mixed bouquet for congratulations
   if (mood === "love") return [[0, props.bouquetL, true]]; // a big bunch of flowers in his left hand
   if (mood === "meeting") return [[1, props.clipboard, true]];
   if (mood === "popcorn") return [[1, props.popcorn, true]]; // held up high, popcorn flying out of it
   if (mood === "heartbreak") return [[1, props.brokenheart, true]];
   if (mood === "working") return WORKING; // no hand props: the desk with the laptop stands in front of him
   if (mood === "shopping") return [[0, props.bagL, false], [1, props.bagR, false]];
-  if (FOODS.includes(mood)) return [[1, props[mood], true]];
+  if (FOODS.includes(mood)) return [[DRINKS.includes(mood) ? 0 : 1, props[mood], true]]; // hot drinks are held in his left hand, food in his right
   return null;
 }
 
@@ -857,13 +903,13 @@ export function createProps(scene, arms, glowTexture, head) {
     return hand;
   });
 
-  const props = { cake: cake(glowTexture), gift: gift(), cocktail: cocktail(glowTexture), bouquet: bouquet(), bouquetL: bouquet(), clipboard: clipboard(), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
+  const props = { cake: cake(glowTexture), gift: gift(), cocktail: cocktail(glowTexture), bouquet: bouquet(RED_ROSES, false), bouquetL: bouquet(RED_ROSES, false), bouquetMix: bouquet(), clipboard: clipboard(), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
   for (const name of FOODS) props[name] = BUILDERS[name](glowTexture);
   props.popcorn = popcorn();
   props.brokenheart = brokenHeart();
   Object.entries(props).forEach(([kind, p]) => { p.userData.kind = kind; p.visible = false; });
-  hands[1].add(props.popcorn, props.brokenheart, props.clipboard, props.bouquet, props.cake, props.bagR, ...FOODS.map((name) => props[name]));
-  hands[0].add(props.bouquetL, props.cocktail, props.gift, props.bagL);
+  hands[1].add(props.popcorn, props.brokenheart, props.clipboard, props.bouquet, props.bouquetMix, props.cake, props.bagR, ...FOODS.filter((name) => !DRINKS.includes(name)).map((name) => props[name]));
+  hands[0].add(props.bouquetL, props.cocktail, props.gift, props.bagL, ...DRINKS.map((name) => props[name]));
 
   // the rest of the party: balloons either side of him, and a hat
   const balloons = partyBalloons();
@@ -971,7 +1017,7 @@ export function createProps(scene, arms, glowTexture, head) {
         prop.userData.steam?.forEach((puff) => {
           const phase = (t * 0.5 + puff.userData.phase) % 1;
           puff.position.set(puff.userData.x + Math.sin(t * 2 + puff.userData.phase * 6) * 0.03, puff.userData.baseY + phase * puff.userData.rise, 0.05);
-          puff.scale.setScalar(0.2 + phase * 0.4);
+          puff.scale.setScalar((0.2 + phase * 0.4) * puff.userData.size);
           puff.material.opacity = amount * 0.85 * Math.sin(Math.PI * phase);
         });
       });
@@ -1030,7 +1076,7 @@ export function createProps(scene, arms, glowTexture, head) {
         }));
       }
 
-      if (props.bouquet.visible) { // a crown for the wedding, and rose petals drifting down for the wedding and congratulations
+      if (props.bouquet.visible || props.bouquetMix.visible) { // a crown for the wedding, and rose petals drifting down for the wedding and congratulations
         weddingCrown.visible = current === "wedding";
         weddingCrown.scale.setScalar(1.2 * amount);
         petals.forEach((p) => {

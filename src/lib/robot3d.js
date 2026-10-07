@@ -626,10 +626,18 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       // eating: lifts the food up to his face, takes a bite and chews; the other hand rests under it
       const { bump, chewing } = foodCycle(seconds);
       const drinking = DRINKS.includes(m);
-      target.armRx = -1.1 - (drinking ? 0.95 : 0.55) * bump; // a sip brings the cup right up to his face
-      target.armRz = -0.45;
-      target.armLx = -0.5;
-      target.armLz = 0.15;
+      const lift = -1.1 - (drinking ? 0.95 : 0.55) * bump; // a sip brings the cup right up to his face
+      if (drinking) { // a hot drink is held in his left hand
+        target.armLx = lift;
+        target.armLz = 0.45;
+        target.armRx = -0.5;
+        target.armRz = -0.15;
+      } else { // food is eaten with his right hand
+        target.armRx = lift;
+        target.armRz = -0.45;
+        target.armLx = -0.5;
+        target.armLz = 0.15;
+      }
       target.headX = (drinking ? -0.15 : 0.25) * bump; // head tips back for a sip, forward for a bite
       target.headZ = Math.sin(t * 3) * 0.05;
       target.bodyY = Math.sin(t * 3) * 0.02 + (chewing ? Math.abs(Math.sin(t * 10)) * 0.015 : 0);
@@ -1127,7 +1135,7 @@ function drawFace(ctx, mood, t, lookX, lookY, speaking, thanksText = 0, greeting
     // a 😋 on the visor too, pulsing as he enjoys it
     ctx.font = `${Math.round(w * 0.17)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
     ctx.textAlign = "center";
-    ctx.fillText("😋", w * 0.84, h * 0.24 + Math.sin(t * 6) * h * 0.02);
+    ctx.fillText(DRINKS.includes(mood) ? "☕" : "😋", w * 0.84, h * 0.24 + Math.sin(t * 6) * h * 0.02); // a hot drink gets a cup instead
   }
   if (mood === "popcorn" || mood === "heartbreak") {
     // 🍿 for the popcorn toss, 💔 for a break-up
