@@ -56,13 +56,14 @@ const DANCE_SPIN_MOVE = 1; // ...and this move (counting from 0) is a full turn
 const smoothstep = (x) => x * x * (3 - 2 * x);
 
 /**
- * One bite of food: the hand lifts to his face, holds, comes down, and he chews (about 1.8 s per bite).
+ * One bite of food: the hand lifts to his face, stays at his mouth while he bites and chews, then comes down (about 2.2 s per bite).
  * `bump` is how high the hand is (0..1); `chewing` is true while his mouth should be moving.
  */
 function foodCycle(seconds) {
-  const p = (seconds * 0.55) % 1;
-  const bump = p < 0.25 ? smoothstep(p / 0.25) : p < 0.5 ? 1 : p < 0.7 ? 1 - smoothstep((p - 0.5) / 0.2) : 0;
-  return { bump, chewing: p > 0.4 && p < 0.85 };
+  const p = (seconds * 0.45) % 1; // one bite takes about 2.2 seconds
+  // up to his mouth quickly, held there while he takes the bite and chews, then down again for a short rest
+  const bump = p < 0.2 ? smoothstep(p / 0.2) : p < 0.6 ? 1 : p < 0.8 ? 1 - smoothstep((p - 0.6) / 0.2) : 0;
+  return { bump, chewing: p > 0.3 && p < 0.9 };
 }
 
 /**
