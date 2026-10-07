@@ -685,11 +685,11 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.headZ = Math.sin(t * 3.5) * 0.08;
       target.stars = 0.5;
     } else if (m === "love") {
-      // one hand on his heart, the other holding out a bouquet to you; swaying, hearts floating up, heart-shaped eyes
-      target.armRx = -1.25;
-      target.armRz = 0.45;
-      target.armLx = -0.9;
-      target.armLz = -0.5;
+      // his right hand on his heart, a big bunch of flowers held out in his left hand; swaying, hearts floating up, heart-shaped eyes
+      target.armRx = -0.9;
+      target.armRz = -0.5;
+      target.armLx = -1.2;
+      target.armLz = -0.45;
       target.headZ = Math.sin(t * 2) * 0.15;
       target.lean = Math.sin(t * 2) * 0.05;
       target.bodyY = Math.abs(Math.sin(t * 3)) * 0.04;

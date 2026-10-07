@@ -817,7 +817,7 @@ function partyHat() {
 }
 
 // how much to enlarge each prop when he holds it (1 = as built)
-const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.1, tea: 2.1 };
+const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.1, tea: 2.1 };
 
 const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
 
@@ -830,7 +830,8 @@ const WORKING = []; // "holding" for the working gesture: nothing in his hands (
 function holdingFor(mood, props) {
   if (mood === "birthday") return [[1, props.cake, true], [0, props.gift, true]]; // a cake with candles, and a present
   if (mood === "party") return [[0, props.cocktail, true]]; // one cocktail
-  if (mood === "wedding" || mood === "love" || mood === "congrats") return [[1, props.bouquet, true]]; // flowers for love, marriage and congratulations
+  if (mood === "wedding" || mood === "congrats") return [[1, props.bouquet, true]]; // flowers for marriage and congratulations
+  if (mood === "love") return [[0, props.bouquetL, true]]; // a big bunch of flowers in his left hand
   if (mood === "meeting") return [[1, props.clipboard, true]];
   if (mood === "popcorn") return [[1, props.popcorn, true]]; // held up high, popcorn flying out of it
   if (mood === "heartbreak") return [[1, props.brokenheart, true]];
@@ -856,13 +857,13 @@ export function createProps(scene, arms, glowTexture, head) {
     return hand;
   });
 
-  const props = { cake: cake(glowTexture), gift: gift(), cocktail: cocktail(glowTexture), bouquet: bouquet(), clipboard: clipboard(), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
+  const props = { cake: cake(glowTexture), gift: gift(), cocktail: cocktail(glowTexture), bouquet: bouquet(), bouquetL: bouquet(), clipboard: clipboard(), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
   for (const name of FOODS) props[name] = BUILDERS[name](glowTexture);
   props.popcorn = popcorn();
   props.brokenheart = brokenHeart();
   Object.entries(props).forEach(([kind, p]) => { p.userData.kind = kind; p.visible = false; });
   hands[1].add(props.popcorn, props.brokenheart, props.clipboard, props.bouquet, props.cake, props.bagR, ...FOODS.map((name) => props[name]));
-  hands[0].add(props.cocktail, props.gift, props.bagL);
+  hands[0].add(props.bouquetL, props.cocktail, props.gift, props.bagL);
 
   // the rest of the party: balloons either side of him, and a hat
   const balloons = partyBalloons();
@@ -1033,7 +1034,6 @@ export function createProps(scene, arms, glowTexture, head) {
         weddingCrown.visible = current === "wedding";
         weddingCrown.scale.setScalar(1.2 * amount);
         petals.forEach((p) => {
-          if (current === "love") return; // love has his floating hearts instead
           const { x, z, offset } = p.userData;
           const fall = (t * 0.3 + offset) % 1;
           p.visible = true;
