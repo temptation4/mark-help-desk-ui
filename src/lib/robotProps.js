@@ -124,6 +124,7 @@ function cupAndSaucer(glowTexture, color, drink, rim) {
   const handle = part(g, new THREE.TorusGeometry(0.045, 0.014, 8, 16), china, 0.135, 0.1);
   handle.scale.set(0.9, 1.1, 1);
   addSteam(g, glowTexture, 0.2, 4, 0.7); // wisps rising, so it clearly looks hot
+  g.userData.rim = 0.16;
   return g;
 }
 
@@ -167,6 +168,7 @@ function coffeeMug(glowTexture) {
   handle.rotation.z = -PI / 2;
   handle.scale.set(1.15, 0.9, 1);
   addSteam(g, glowTexture, 0.27, 7, 0.75, 0xc9d3de, 0.9); // small curling wisps rising from the cup: it is hot
+  g.userData.rim = 0.22; // how high the rim is above the base, to put it at his mouth when he sips
   return g;
 }
 
@@ -972,6 +974,7 @@ export function createProps(scene, arms, glowTexture, head) {
     return bit;
   });
   const bucketAt = new THREE.Vector3();
+  const mouthAt = new THREE.Vector3();
 
   const desk = deskWithLaptop(glowTexture);
   desk.visible = false;
@@ -1009,11 +1012,19 @@ export function createProps(scene, arms, glowTexture, head) {
         if (keepUpright) hand.rotation.set(-arms[handIndex].rotation.x, 0, -arms[handIndex].rotation.z);
         else hand.rotation.set(0, 0, 0);
         // sipping: the cup tips its rim towards his face while the hand is raised
-        if (DRINKS.includes(prop.userData.kind)) { // the mug tips with its rim towards his mouth (away from us) and in towards the middle of his face
-          hand.rotation.x -= 0.65 * sip;
-          hand.rotation.z -= 0.5 * sip;
-          // his arm cannot reach round the front of his head, so the mug also slides forward and in: it ends up in front of his mouth, where we can see it
-          prop.position.set(0.2 * sip, -0.12 * sip, 0.6 * sip);
+        if (DRINKS.includes(prop.userData.kind)) {
+          hand.rotation.x -= 0.45 * sip; // the top of the mug tips back, towards his face
+          if (sip > 0.001) {
+            // his arm is a stiff stick that cannot reach round the front of his head, so the cup is moved to where his mouth is: the middle of the
+            // visor, low down, just in front of the glass. The rim of the cup (not its base) is put at the mouth, so mouth and mug line up.
+            head.updateWorldMatrix(true, false);
+            hand.updateWorldMatrix(true, false);
+            mouthAt.set(0, 0.31, 0.95);
+            head.localToWorld(mouthAt);
+            hand.worldToLocal(mouthAt);
+            const rim = (prop.userData.rim ?? 0.2) * prop.scale.y;
+            prop.position.set(mouthAt.x * sip, (mouthAt.y - rim) * sip, mouthAt.z * sip);
+          }
         }
       });
 
