@@ -36,7 +36,8 @@ const LABEL = {
   clapping: "is clapping",
   cheering: "is cheering",
   delighted: "is giggling",
-  birthday: "is partying with cake, balloons and a sparkling drink",
+  birthday: "is celebrating a birthday: a cake with lit candles, a present, balloons and a party hat",
+  party: "is at a party, toasting with a sparkling drink under balloons",
   shopping: "is shopping with bags in both hands",
 
   // Food
@@ -47,6 +48,7 @@ const LABEL = {
   coffee: "is sipping hot coffee from a small cup",
   tea: "is sipping hot tea from a teacup",
   fries: "is eating fries",
+  popcorn: "is eating popcorn from a striped bucket on movie night",
   noodles: "is slurping hot Korean ramyeon",
   tteokbokki: "is eating spicy tteokbokki",
   veggies: "is munching fresh vegetables",

@@ -22,19 +22,20 @@ const TRY = 'Try "thank you", "i want pizza", "dance for me", "you are so cute" 
 const CHAT_REPLIES = [
   [/\b(hi|hello|hey|namaste)\b/i, `Hi! I'm Mark. This page is a demo, so my answers are canned, but my reactions are real. ${TRY}`],
   [/\b(thanks|thank you|thx)\b/i, "You're welcome! Did you see the bow? The real app answers with a local AI model."],
+  [/\b(movies?|films?|netflix|popcorn|cinema)\b/i, "Movie night! 🍿 I brought the popcorn. The real app answers with an AI model; here I only have a few canned lines."],
   [/\b(birthday)\b/i, "Happy birthday! 🎂 I brought the cake. In the real app I would also chat about your day."],
   [/\b(pizza|burger|food|hungry|noodles|coffee)\b/i, "Yum! I love props. The real app answers with an AI model, here I only have a few canned lines."],
 ];
 
 const AGENT_REPLIES = {
-  chat: `This is demo mode, so I cannot think up a real answer. ${TRY}\n\nThe real app answers with a local AI model (see the README).`,
+  chat: `Ooh, nice one! This is demo mode, so my answers are canned, but my reactions are real. ${TRY}\n\nThe real app answers with a local AI model (see the README).`,
   troubleshoot:
     "Demo mode: in the real app I would check your laptop now with my MCP tools (for example checkWifiStatus and diagnoseWifi), tell you what they found, and open a ticket only if the problem is still there.\n\n" +
     "Here nothing is checked and no ticket is created. To see it for real, run the backend from the README, or watch the Troubleshoot clip.",
   interview:
     "Demo mode: in the real app I would search your folder, read your resume with a real file tool, and save projects for you.\n\n" +
     "Here is a taste of a mock interview instead. Question 1: what is the difference between a List and a Set in Java, and when would you use each?\n\n" +
-    "(In the demo I cannot score your answer. The real agent does, one question at a time.)",
+    "(In the demo nothing scores your answer. The real agent does, one question at a time.)",
 };
 
 function demoAnswer(message, agent) {

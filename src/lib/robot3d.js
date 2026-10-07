@@ -37,7 +37,7 @@ const BULB = {
   wave: 0x4ade80, spin: 0x4ade80, dance: 0x4ade80, surprised: 0xfbbf24, delighted: 0x4ade80, grabbed: 0xfbbf24, nod: 0x67e8f9,
   thanks: 0xf472b6,
   hurt: 0x94a3b8, crying: 0x94a3b8, sleepy: 0x94a3b8, angry: 0xef4444, excited: 0xfbbf24, confused: 0xc084fc, scared: 0xfbbf24,
-  clapping: 0x4ade80, cheering: 0x4ade80, love: 0xf472b6, namaste: 0xfb923c, birthday: 0xf472b6, shopping: 0xfbbf24,
+  clapping: 0x4ade80, cheering: 0x4ade80, love: 0xf472b6, namaste: 0xfb923c, birthday: 0xf472b6, party: 0xc084fc, shopping: 0xfbbf24,
 };
 for (const food of FOODS) BULB[food] = 0xfb923c; // orange while he eats
 const bulbFor = (mood) => BULB[mood] ?? BULB.neutral;
@@ -47,8 +47,8 @@ const ALIAS = { running: "thinking", walking: "thinking" };
 const canonical = (mood) => ALIAS[mood] ?? mood;
 
 // Moods whose eyes are drawn as happy "smiling arcs".
-const HAPPY_EYES = ["happy", "dance", "spin", "delighted", "thanks", "namaste", "excited", "cheering", "clapping", "birthday", "shopping", "proud", "magic", "thumbs_up", ...FOODS];
-const BIG_SMILE = ["happy", "dance", "spin", "excited", "cheering", "clapping", "birthday", "shopping"]; // open-mouth smile
+const HAPPY_EYES = ["happy", "dance", "spin", "delighted", "thanks", "namaste", "excited", "cheering", "clapping", "birthday", "party", "shopping", "proud", "magic", "thumbs_up", ...FOODS];
+const BIG_SMILE = ["happy", "dance", "spin", "excited", "cheering", "clapping", "birthday", "party", "shopping"]; // open-mouth smile
 const SPIN_SECONDS = 1.4; // how long the spin gesture takes
 const DANCE_MOVE_SECONDS = 2.4; // each move of the dance routine lasts this long
 const DANCE_SPIN_MOVE = 1; // ...and this move (counting from 0) is a full turn
@@ -528,18 +528,20 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
     state.bump = 0; // how high his hand is during a bite or sip (0..1), so drinks can tilt their cup
     const seconds = t - state.moodStart;
 
-    if (m === "birthday") {
-      // a party: cake in one hand, a sparkling drink raised in a toast in the other, dancing about
+    if (m === "birthday" || m === "party") {
+      // birthday: a cake with candles in one hand and a present in the other; party: a sparkling drink raised in a toast. Both dance about
       const toast = Math.max(0, Math.sin(t * 1.8)) * 0.35; // the glass lifts now and then
       target.bodyY = Math.abs(Math.sin(t * 6)) * 0.07;
       target.headZ = Math.sin(t * 3) * 0.12;
       target.lean = Math.sin(t * 3) * 0.05;
       target.legLx = Math.sin(t * 6) * 0.25;
       target.legRx = -Math.sin(t * 6) * 0.25;
-      target.armRx = -1.15 + Math.sin(t * 6) * 0.04;
-      target.armRz = -0.4;
-      target.armLx = -1.25 - toast;
-      target.armLz = 0.45;
+      // with the cake and the present he holds both arms out to the sides, so the candles are not hidden behind his head (an arm pointing at the camera cannot be moved sideways)
+      const out = m === "birthday";
+      target.armRx = (out ? -0.55 : -1.15) + Math.sin(t * 6) * 0.04;
+      target.armRz = out ? 0.9 : -0.4; // positive = the right arm swings out to the side
+      target.armLx = out ? -0.55 : -1.25 - toast;
+      target.armLz = out ? -0.9 : 0.45; // negative = the left arm swings out to the side
       target.stars = 1;
       target.props = 1;
     } else if (m === "shopping") {

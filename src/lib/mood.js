@@ -48,9 +48,10 @@ const INSULT = new RegExp(
 );
 
 // Parties, shopping and food. Mark joins in with cake and balloons, shopping bags, or whatever you are eating.
-const BIRTHDAY = /\b(birthday|b'?day|bday|anniversary|congrat\w*|celebrat\w*|cakes?|balloons?|many happy returns|wish you)\b|(?<!third[ -])\bparty\b/i;
+const BIRTHDAY = /\b(birthday|b'?day|bday|anniversary|cakes?|many happy returns)\b/i; // cake, candles and a present
+const PARTY = /\b(congrat\w*|celebrat\w*|balloons?|wish you)\b|(?<!third[ -])\bparty\b/i; // balloons, hat and a sparkling drink
 const SHOPPING = /\b(shopping|shopped|mall|groceries|grocery|supermarket|shopping bags?|flipkart|myntra|walmart|big sale|on sale|discounts?|(?:let'?s|going to|gonna|want to|wanna) (?:buy|shop)|i (?:just )?bought)\b/i;
-const FOOD_GESTURES = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea"];
+const FOOD_GESTURES = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea", "popcorn"];
 const pickFood = () => FOOD_GESTURES[Math.floor(Math.random() * FOOD_GESTURES.length)];
 
 // Checked in this order; the first pattern that matches decides. `gesture` is what Mark plays (see
@@ -95,6 +96,7 @@ const USER_RULES = [
   // a real problem beats the fun topics below: "my pizza app is not working" is a problem first
   { test: /\b(not working|doesn'?t work|won'?t (start|work|turn on|open|load)|broken|error|crash\w*|failed|failure|bug)\b/i, gesture: "sad" },
   { test: BIRTHDAY, gesture: "birthday" },
+  { test: PARTY, gesture: "party" },
   { test: SHOPPING, gesture: "shopping" },
   { test: /\b(momos?|dumplings?|dim ?sum|gyoza|wontons?|pierogi)\b/i, gesture: "momos" },
   // (no "apple" or "cherry" alone: "my Apple laptop" and "Cherry keyboard" are help desk talk, not fruit)
@@ -105,12 +107,13 @@ const USER_RULES = [
   // (plain "chips" is also hardware talk, so it needs a food word next to it)
   { test: /\b(potato chips|crisps|lays|doritos|pringles|snacks?|(?:eat(?:ing)?|want|some|bag of|packet of|have) chips)\b/i, gesture: "chips" },
   { test: /\b(tea|chai|matcha|kadha|green tea|herbal tea)\b/i, gesture: "tea" },
+  { test: /\b(movies?|films?|cinema|netflix|popcorn|binge[- ]?watch\w*|web ?series|tv show|theat(?:er|re))\b/i, gesture: "popcorn" }, // movie night
   { test: /\b(pizzas?|pepperoni|margherita)\b/i, gesture: "pizza" },
   { test: /\b(burgers?|hamburgers?|cheeseburgers?|sandwich(?:es)?)\b/i, gesture: "burger" },
   { test: /\b(ice[- ]?creams?|gelato|kulfi|sundae|popsicle)\b/i, gesture: "icecream" },
   { test: /\b(donuts?|doughnuts?|dessert|brownies?|cupcakes?|muffins?)\b/i, gesture: "donut" },
   { test: /\b(coffee|coffe+|cofee|capp?uc+ino|latte|cappuccino|espresso|mocha|juice|smoothie|milkshake|soda|cola|drinks?)\b/i, gesture: "coffee" },
-  { test: /\b(french fries|fries|nuggets|samosas?|popcorn|tacos?|nachos?)\b/i, gesture: "fries" },
+  { test: /\b(french fries|fries|nuggets|samosas?|tacos?|nachos?)\b/i, gesture: "fries" },
   { test: /\b(tteokbokki|topokki|tteok)\b/i, gesture: "tteokbokki" },
   { test: /\b(noodles?|pasta|ramen|ramyeon|ramyun|kimchi|bibimbap|korean|jjajangmyeon|bulgogi|kimbap|udon|pho|spaghetti|maggi|rice|biryani|soup|curry|dosa|idli|thali|dal)\b/i, gesture: "noodles" },
   { test: /\b(food|hungry|starving|lunch|dinner|breakfast|brunch|eat(?:ing)?|meal|yummy|delicious|tasty|cook(?:ing)?)\b/i, gesture: pickFood },

@@ -7,7 +7,7 @@
 import * as THREE from "three";
 
 // The gestures that give him something to hold (the food ones all work the same way: lift, bite, chew).
-export const FOODS = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea"];
+export const FOODS = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea", "popcorn"];
 export const DRINKS = ["coffee", "tea"]; // these are sipped (cup tilts towards his face) rather than bitten and chewed
 
 const { PI } = Math;
@@ -304,6 +304,30 @@ function chips() {
   return g;
 }
 
+/** Movie night: a red and white striped popcorn bucket heaped with fluffy popcorn. */
+function popcorn() {
+  const g = new THREE.Group();
+  const red = paint(0xe03a3a, 0.45), white = paint(0xffffff, 0.45);
+  // the bucket: eight stripes around a cone that is wider at the top
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * PI * 2;
+    const stripe = part(g, new THREE.BoxGeometry(0.1, 0.34, 0.025), i % 2 ? white : red, Math.cos(a) * 0.145, 0.17, Math.sin(a) * 0.145);
+    stripe.rotation.y = -a + PI / 2;
+    stripe.rotation.z = Math.cos(a) * 0.1; // leans out at the top
+    stripe.rotation.x = -Math.sin(a) * 0.1;
+  }
+  part(g, new THREE.CylinderGeometry(0.13, 0.13, 0.02, 16), red, 0, 0.01); // the bottom
+  // the popcorn: a heap of fluffy cream puffs with a few buttery yellow ones
+  const cream = paint(0xfff1c9, 0.7), butter = paint(0xf6c445, 0.6);
+  for (let i = 0; i < 16; i++) {
+    const a = i * 2.4, ring = 0.03 + (i % 5) * 0.03;
+    const puff = part(g, new THREE.IcosahedronGeometry(0.055 + (i % 3) * 0.012, 0), i % 4 === 0 ? butter : cream,
+      Math.cos(a) * ring, 0.36 + (i % 4) * 0.035, Math.sin(a) * ring);
+    puff.rotation.set(i, i * 2, 0);
+  }
+  return g;
+}
+
 /** Tteokbokki: chewy rice cakes in fiery red sauce. */
 function tteokbokki(glowTexture) {
   const g = new THREE.Group();
@@ -337,13 +361,32 @@ function cake(glowTexture) {
   icing.rotation.x = PI / 2;
   part(g, new THREE.CylinderGeometry(0.17, 0.17, 0.12, 32), paint(0xfff4e0, 0.5), 0, 0.235);
   part(g, new THREE.SphereGeometry(0.035, 12, 10), paint(0xd62839, 0.3), 0.07, 0.31, 0.04); // cherry
-  part(g, new THREE.CylinderGeometry(0.018, 0.018, 0.14, 10), paint(0x4aa3ff), 0, 0.37); // candle
-  const flame = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: glowTexture, color: 0xffb347, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false }),
-  );
-  flame.position.y = 0.52;
-  g.add(flame);
-  g.userData.flame = flame;
+  // a birthday cake has candles: five of them in different colours, each with its own flickering flame
+  g.userData.flames = [0xff6fa5, 0x4aa3ff, 0xffd23f, 0x7ee081, 0xc084fc].map((color, i) => {
+    const a = (i / 5) * PI * 2, x = Math.cos(a) * 0.1, z = Math.sin(a) * 0.1;
+    part(g, new THREE.CylinderGeometry(0.016, 0.016, 0.2, 10), paint(color), x, 0.41, z); // candle
+    const flame = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: glowTexture, color: 0xffb347, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false }),
+    );
+    flame.position.set(x, 0.57, z);
+    g.add(flame);
+    return flame;
+  });
+  return g;
+}
+
+/** A wrapped present: a box with a ribbon across it and a bow on top. */
+function gift() {
+  const g = new THREE.Group();
+  part(g, new THREE.BoxGeometry(0.3, 0.24, 0.3), paint(0x4ea8ff, 0.45), 0, 0.12);
+  const ribbon = paint(0xff4d6d, 0.4);
+  part(g, new THREE.BoxGeometry(0.06, 0.25, 0.31), ribbon, 0, 0.12);
+  part(g, new THREE.BoxGeometry(0.31, 0.25, 0.06), ribbon, 0, 0.12);
+  [-1, 1].forEach((side) => { // the two loops of the bow
+    const loop = part(g, new THREE.TorusGeometry(0.06, 0.018, 8, 16), ribbon, side * 0.06, 0.29);
+    loop.rotation.x = PI / 2;
+  });
+  part(g, new THREE.SphereGeometry(0.03, 10, 8), ribbon, 0, 0.27);
   return g;
 }
 
@@ -398,16 +441,17 @@ function partyHat() {
 }
 
 // how much to enlarge each prop when he holds it (1 = as built)
-const SIZE = { cake: 1.6, flute: 1.9, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, coffee: 2.1, tea: 2.1 };
+const SIZE = { cake: 1.9, gift: 1.5, flute: 1.9, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.6, coffee: 2.1, tea: 2.1 };
 
-const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
+const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea, popcorn };
 
 /**
  * What he holds for each gesture: [which hand (0 = his left, 1 = his right), prop, keepUpright].
  * keepUpright props (food, cake) stay level whichever way the arm swings; bags and balloons just hang from it.
  */
 function holdingFor(mood, props) {
-  if (mood === "birthday") return [[1, props.cake, true], [0, props.flute, true]];
+  if (mood === "birthday") return [[1, props.cake, true], [0, props.gift, true]]; // a cake with candles, and a present
+  if (mood === "party") return [[0, props.flute, true]]; // a toast with a sparkling drink
   if (mood === "shopping") return [[0, props.bagL, false], [1, props.bagR, false]];
   if (FOODS.includes(mood)) return [[1, props[mood], true]];
   return null;
@@ -429,11 +473,11 @@ export function createProps(scene, arms, glowTexture, head) {
     return hand;
   });
 
-  const props = { cake: cake(glowTexture), flute: flute(glowTexture), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
+  const props = { cake: cake(glowTexture), gift: gift(), flute: flute(glowTexture), bagL: bag(0xff6fa5), bagR: bag(0x4aa8ff) };
   for (const name of FOODS) props[name] = BUILDERS[name](glowTexture);
   Object.entries(props).forEach(([kind, p]) => { p.userData.kind = kind; p.visible = false; });
   hands[1].add(props.cake, props.bagR, ...FOODS.map((name) => props[name]));
-  hands[0].add(props.flute, props.bagL);
+  hands[0].add(props.flute, props.gift, props.bagL);
 
   // the rest of the party: balloons either side of him, and a hat
   const balloons = partyBalloons();
@@ -503,10 +547,11 @@ export function createProps(scene, arms, glowTexture, head) {
         spark.material.opacity = twinkle;
       });
 
-      const flame = props.cake.userData.flame;
-      if (props.cake.visible) flame.scale.setScalar(0.17 + Math.sin(t * 17) * 0.02 + Math.sin(t * 29) * 0.015);
-
       if (props.cake.visible) {
+        props.cake.userData.flames.forEach((flame, i) => flame.scale.setScalar(0.2 + Math.sin(t * 17 + i * 2) * 0.025 + Math.sin(t * 29 + i) * 0.015));
+      }
+
+      if (props.cake.visible || props.flute.visible) { // the rest of the party: balloons, hat and confetti
         balloons.visible = true;
         balloons.scale.setScalar(amount);
         balloons.children.forEach((bunch) => { bunch.rotation.z = Math.sin(t * 1.3 + bunch.userData.sway) * 0.05; });
