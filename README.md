@@ -1,6 +1,6 @@
 # Mark: a help desk you actually enjoy talking to
 
-A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives on your screen, reacts to what you type, brings you pizza when you are hungry, bows when you say thanks, and walks away when you drag him into the corner bin. Behind him are three AI agents that can really check your laptop, read and write your files, and find jobs and prepare applications for you. You can sign in with email and password or **with Google**.
+A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives on your screen, reacts to what you type, brings you pizza when you are hungry, bows when you say thanks, and walks away when you drag him into the corner bin. Behind him are four AI agents that can really check your laptop, read and write your files, and find jobs and prepare applications for you. You can sign in with email and password or **with Google**.
 
 > The UI is open source (this repo). The backend it talks to (login service, AI agents, tools) is a separate **private** repo; this README explains how it works so you can see the whole picture.
 
@@ -11,7 +11,7 @@ A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives 
 Sign in with any email and password and say hello. It runs entirely in your browser with no backend, so it is a **demo mode**:
 
 - **Real:** Mark himself. His reactions, the dragging and the corner bin all work. Try *"i want pizza"*, *"dance for me"*, *"thank you"*, *"you are so cute"*, *"movie night"*, *"let's celebrate"*, *"i love you mark"* or *"working late at the office"*.
-- **Canned:** the login (including the demo Google button) and the answers of the three agents (the real ones need the Java backend and local AI models). Voice, file upload and the laptop/file tools are switched off.
+- **Canned:** the login (including the demo Google button) and the answers of the agents (the real ones need the Java backend and local AI models). Voice, file upload and the laptop/file tools are switched off.
 
 To see the agents doing real work (checking a laptop, reading and saving files), watch the first video below; the second shows what is new. To run the demo yourself: `npm run build:demo` (output in `dist/`) or `VITE_DEMO=true npm run dev`.
 
@@ -73,13 +73,19 @@ Drag Mark and he dangles from your pointer. Let go and he stays where you droppe
 
 ## The backend agents
 
-Mark is the face. Behind the chat there are three **agents**, each a different prompt plus different tools. You pick one under the message box ("Chat", or "Select agent"), and the UI sends it in an `Agent` header with every message.
+Mark is the face. Behind the chat there are four **agents**, each a different prompt plus different tools. You pick one under the message box ("Chat", or "Select agent"), and the UI sends it in an `Agent` header with every message.
 
 | Agent | What it is for | What it can use |
 |---|---|---|
 | **Chat** | Friendly conversation and general questions | Nothing but the model |
 | **Troubleshoot** | "My wifi keeps disconnecting", "my laptop is slow" | Ticket tools (look up, create and update support tickets) and 13 **laptop check tools** through an MCP server: Wi-Fi status, connected network, internet, DNS, ping, a full Wi-Fi diagnosis, CPU, memory, disk, uptime and top processes. It runs a check first, tells you what it found, and opens a ticket only if the problem is still there. |
 | **Interview prep** | Review your resume, write one, practise a mock interview, write and save sample code projects | Real **file tools** through an MCP server (list, search, read and write files in one allowed folder). It can read your resume, save a new one, and save a code project for you. You can also upload a resume or job description. It can also help with a **job search** (see below). |
+
+| **Agentic helpdesk** | One place for problems and jobs, with every step on show | Runs a **Goal, Decide, Act, Observe** loop. **Jev** (plain Java rules, no AI) rates the urgency, picks the check, looks up tickets, and decides between opening or updating a ticket, or what to do with each scored job; the AI model only words the reply (and decides when no rule applies). Every action passes Jev's gate, and the steps are streamed into the chat. |
+
+### Agentic helpdesk: watch it think, step by step
+
+Pick **Agentic helpdesk** and describe a problem (with your email) or ask for jobs. The reply starts with a small trace of what the agent did: 🎯 the goal, ⚖️ Jev's triage and advice, 🔧 each action and who chose it, 👀 what the tool returned, ⛔ anything Jev refused. The hosted demo shows a made-up run in the same format. The deciding is done by Jev, plain Java with no model, so it is repeatable and tested; the AI model is only used when no rule applies and to write the reply, and a reply that the facts do not support is replaced by one Jev writes.
 
 ### Troubleshoot agent: checks your real laptop
 
