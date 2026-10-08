@@ -45,7 +45,27 @@ const AGENT_REPLIES = {
     "(In the demo nothing scores your answer. The real agent does, one question at a time.)",
 };
 
+// A made-up run of the agentic helpdesk, in the same format the real backend streams (steps first, then the reply).
+function agenticDemo(message) {
+  const goal = message.replace(/\s+/g, " ").trim().slice(0, 160);
+  return [
+    `🎯 **Goal:** ${goal}`,
+    "⚖️ **Jev:** urgency 75/100, so priority HIGH, category network (the user is blocked or something stopped working)",
+    "🔧 **Act** (chosen by Jev): `checkWifiStatus` {} — check the laptop first",
+    "👀 **Observe:** (demo) Wi-Fi is on but the signal is weak and the connection keeps dropping",
+    "🔧 **Act** (chosen by Jev): `getTicketsByEmail` {\"email\":\"you@example.com\"} — look for an existing ticket",
+    "👀 **Observe:** []",
+    "⚖️ **Jev:** the user has no tickets yet, so a new one is fine if the problem is real.",
+    "🔧 **Act** (chosen by Jev): `createTicket` {\"priority\":\"HIGH\",\"category\":\"network\"} — the problem is real and has no ticket yet",
+    "👀 **Observe:** (demo) ticket DEMO-1 created, status OPEN",
+    "",
+    "Demo mode: this run is made up, but the real agent works exactly like this. Jev (plain Java rules) picked every step and filled in the arguments; " +
+      "the AI model only wrote this reply. In the real app the laptop checks and the ticket are real, and you can also ask it to find jobs. See the README.",
+  ].join("\n");
+}
+
 function demoAnswer(message, agent) {
+  if (agent === "agentic") return agenticDemo(message);
   if (agent === "chat") {
     const match = CHAT_REPLIES.find(([pattern]) => pattern.test(message));
     if (match) return match[1];

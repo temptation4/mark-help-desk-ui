@@ -12,9 +12,35 @@ function TypingDots() {
   );
 }
 
+// The steps of the agentic helpdesk arrive as lines that start with one of these emojis (goal, Jev, act, observe, blocked).
+const STEP = /^(🎯|⚖️|🔧|👀|⛔) /;
+
+// **bold** and `code` inside a step line
+function StepLine({ line }) {
+  return line.split(/(\*\*[^*]+\*\*|`[^`]+`)/).map((part, i) => {
+    if (part.startsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("`")) return <code key={i} className="rounded bg-background/70 px-1">{part.slice(1, -1)}</code>;
+    return <React.Fragment key={i}>{part}</React.Fragment>;
+  });
+}
+
 // Text with code blocks: the parts between ``` fences are shown as code, the rest as normal text. A block that is
 // still being typed (no closing fence yet) already shows as code.
 function MessageText({ text }) {
+  // the agent's steps at the start of the reply are shown as a small trace, the rest is the reply
+  const lines = text.split("\n");
+  let steps = 0;
+  while (steps < lines.length && STEP.test(lines[steps])) steps++;
+  if (steps > 0) {
+    return (
+      <>
+        <div className="mb-2 flex flex-col gap-0.5 rounded-lg border bg-background/60 px-2 py-1.5 text-xs text-muted-foreground" aria-label="What the agent did">
+          {lines.slice(0, steps).map((line, i) => <div key={i} className="break-words"><StepLine line={line} /></div>)}
+        </div>
+        <MessageText text={lines.slice(steps).join("\n").replace(/^\n+/, "")} />
+      </>
+    );
+  }
   return text.split(/(```[\s\S]*?(?:```|$))/).map((part, i) => {
     if (i % 2 === 0) {
       return part ? <span key={i} className="whitespace-pre-wrap break-words">{part}</span> : null;
