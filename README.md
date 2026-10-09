@@ -108,7 +108,7 @@ The Interview agent can find real jobs, match them to your profile and prepare a
 - **Real listings** come from official job APIs (Arbeitnow and Remotive need no key; Adzuna, with your own free key, covers India). **Naukri has no public API**, so Mark only gives you a Naukri search link to open and sign in to yourself: the agent never asks for a Naukri password, logs in or scrapes.
 - **Matching** is a calculated 0-100 score with matched and missing skills, not a guess.
 - **Nothing is ever sent for you.** Mark prepares a *draft* cover note from your profile. **You** read it and press **Approve** (the AI has no way to), then **Open apply page** takes you to the job's own site where you submit it, and **I applied** records it.
-- The AI is checked: a job link that no tool returned, or a cover letter it wrote itself instead of saving a draft, is thrown away and asked again.
+- For checked answers use the **Agentic helpdesk**: Jev plans the steps, and a reply with a job link no tool returned is replaced by one Jev writes from the facts.
 
 The hosted demo has a made-up draft so you can try the Approve and apply buttons:
 
@@ -125,13 +125,13 @@ auth-service  ----- signs JWTs ----->  help-desk (Spring Boot + Spring AI)
   login/register)  published as JWKS)        |-- conversation memory (per user)
                                              |-- MCP client --> laptop-troubleshooting-mcp   (Troubleshoot)
                                              |-- MCP client --> java-mcp-filesystem-server   (Interview prep)
-                                             '-- reply guard: retries empty answers, tool calls written as text, invented ticket ids
+                                             '-- AgentLoop + Jev (the agentic helpdesk): plans the steps, checks every action
 ```
 
 - **Spring Boot 4, Java 21, Spring AI 2** with local models through **Ollama**; the models run on your own machine.
 - **Login is its own microservice** (`auth-service`). It issues RS256 tokens and publishes its public key; the help-desk service only *verifies* tokens and never sees a password.
 - **MCP (Model Context Protocol)**: the agents get their tools from small separate MCP servers, so tools can be added without touching the agent code.
-- **Honest agents**: replies list the tools the model actually called, and the reply guard throws away answers that mention a ticket that does not exist.
+- **Honest agents**: replies list the tools the model actually called, and the agentic helpdesk replaces an answer that mentions a ticket or link no tool returned.
 - Voice: speech-to-text and text-to-speech are optional extras in the backend.
 
 ## Sign in

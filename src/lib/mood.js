@@ -217,24 +217,13 @@ export function detectMood(text) {
   return "neutral";
 }
 
-// Text the backend (AIService.java) adds when the model's answer could not be trusted. If the model
-// invents a ticket number, the server notices, prints the correction and asks again, so the reply holds
-// the made-up attempt(s) followed by the final one. Keep these in step with AIService.
-const CORRECTION_MARKER = "One correction";
+// The text the backend (AgentLoop.java) answers with when it could not handle a message. Keep it in step with AgentLoop.
 const GAVE_UP_MARKER = "Sorry, I had trouble processing that";
 
-/**
- * True if the reply reports that a ticket was created, logged or updated: time to celebrate.
- *
- * Only the FINAL attempt counts. A fabricated ticket earlier in the same reply must not make him
- * celebrate, and neither must a reply where the server gave up after the model kept inventing numbers.
- */
+/** True if the reply reports that a ticket was created, logged or updated: time to celebrate. (Not when the server gave up.) */
 export function isTicketNews(text) {
   if (!text || text.includes(GAVE_UP_MARKER)) return false;
-
-  const finalAttempt = text.split(CORRECTION_MARKER).pop();
-  return /\bticket\b[^.\n]{0,30}#\s*\d+/i.test(finalAttempt)
-    && /\b(created|logged|opened|raised|updated|resolved|closed)\b/i.test(finalAttempt);
+  return /\bticket\b[^.\n]{0,30}#\s*\d+/i.test(text) && /\b(created|logged|opened|raised|updated|resolved|closed)\b/i.test(text);
 }
 
 // ------------------------------------------------------------------------------------------------
