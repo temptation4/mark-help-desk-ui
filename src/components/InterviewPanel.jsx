@@ -1,8 +1,7 @@
 import React, { useRef, useState } from "react";
-import { FileSearch, FilePlus2, FolderGit2, Upload } from "lucide-react";
+import { FileSearch, FilePlus2, FolderGit2, Briefcase, Upload } from "lucide-react";
 import { Button } from "./ui/button";
 import { uploadInterviewFile } from "../services/interview.service";
-import JobsPanel from "./JobsPanel";
 
 // The buttons only type a message for you: the interview agent does the work with the file tools of the MCP file server.
 const TOPICS = ["Java", "Spring Boot", "Kafka", "System design", "Behavioural"];
@@ -10,6 +9,8 @@ const FILE_ACTIONS = [
   { label: "Check my resume", message: "Check my resume", Icon: FileSearch },
   { label: "Create my resume", message: "Create my resume from my projects", Icon: FilePlus2 },
   { label: "My projects", message: "What projects do I have?", Icon: FolderGit2 },
+  // Mark builds the Naukri and LinkedIn search pages; you open one and apply on the site yourself
+  { label: "Job links", message: "Give me Naukri and LinkedIn job search links. Ask me for the role and city if you do not know them.", Icon: Briefcase },
 ];
 
 // What can be uploaded. A resume and a job description are text or PDF; "other" can also be code.
@@ -96,7 +97,6 @@ function InterviewPanel({ onSend, busy }) {
         )}
       </div>
 
-      <JobsPanel onSend={onSend} busy={busy} />
     </div>
   );
 }

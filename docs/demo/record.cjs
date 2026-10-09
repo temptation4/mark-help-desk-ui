@@ -148,15 +148,12 @@ if (process.env.PART === "new") {
   await scene("21-office", "Working late: he sits at his laptop", async () => { await say("working late at the office today"); await sleep(8500); });
   await scene("22-coffee", "Coffee break", async () => { await say("i need my morning coffee"); await sleep(8500); });
   await scene("23-heartbreak", "A breakup: he has a broken heart", async () => { await say("we had a breakup today"); await sleep(8000); });
-  await scene("24-jobs", "Interview agent + Jobs: you approve, then apply on the job site yourself", async () => {
+  await scene("24-job-links", "Job links: Naukri and LinkedIn search pages, you apply on the site", async () => {
     await send("Page.navigate", { url: URL + "/#/chat/new" }); await sleep(2500);
-    await caption("Interview agent + Jobs: you approve, then apply on the job site yourself");
+    await caption("Job links: Naukri and LinkedIn search pages, you apply on the site");
     await clickText("button", "Select agent"); await sleep(800);
     await clickText('[role="menuitemradio"]', "Interview prep"); await sleep(1800);
-    await clickText("button", "Find jobs for me"); await sleep(5500);
-    await clickText("button", "Applications"); await sleep(2000);
-    await clickText("button", "Approve"); await sleep(2500);
-    await sleep(2500);
+    await clickText("button", "Job links"); await sleep(9000);
   });
 } else if (process.env.PART === "agents") {
   // click a button / menu item by its visible text, with a real mouse click

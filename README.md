@@ -1,6 +1,6 @@
 # Mark: a help desk you actually enjoy talking to
 
-A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives on your screen, reacts to what you type, brings you pizza when you are hungry, bows when you say thanks, and walks away when you drag him into the corner bin. Behind him are three AI agents that can really check your laptop, read and write your files, and find jobs and prepare applications for you. You can sign in with email and password or **with Google**.
+A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives on your screen, reacts to what you type, brings you pizza when you are hungry, bows when you say thanks, and walks away when you drag him into the corner bin. Behind him are three AI agents that can really check your laptop, read and write your files, and give you Naukri and LinkedIn job search links. You can sign in with email and password or **with Google**.
 
 > The UI is open source (this repo). The backend it talks to (login service, AI agents, tools) is a separate **private** repo; this README explains how it works so you can see the whole picture.
 
@@ -21,11 +21,11 @@ To see the agents doing real work (checking a laptop, reading and saving files),
 
 *Click the picture to play the full demo (about 2.5 minutes). Everything in it is recorded from the real app, nothing is mocked.*
 
-### What's new: Google sign-in, more of Mark, and the Jobs screen
+### What's new: Google sign-in, more of Mark, and job links
 
 [![Watch what's new](docs/media/poster-new.png)](docs/media/mark-demo-new.mp4)
 
-*About 1.5 minutes. This one is recorded in the hosted **demo mode**, so the answers are canned, but Mark, the sign-in page and the Jobs screen are the real UI.*
+*About 1.5 minutes. This one is recorded in the hosted **demo mode**, so the answers are canned, but Mark, the sign-in page and the Job links button are the real UI.*
 
 ## Talking to Mark is fun
 
@@ -79,7 +79,7 @@ Mark is the face. Behind the chat there are three **agents**, each a different p
 |---|---|---|
 | **Chat** | Friendly conversation and general questions | Nothing but the model |
 | **Troubleshoot** | "My wifi keeps disconnecting", "my laptop is slow" | Ticket tools (look up, create and update support tickets) and 13 **laptop check tools** through an MCP server: Wi-Fi status, connected network, internet, DNS, ping, a full Wi-Fi diagnosis, CPU, memory, disk, uptime and top processes. It runs a check first, tells you what it found, and opens a ticket only if the problem is still there. |
-| **Interview prep** | Review your resume, write one, practise a mock interview, write and save sample code projects | Real **file tools** through an MCP server (list, search, read and write files in one allowed folder). It can read your resume, save a new one, and save a code project for you. You can also upload a resume or job description. It can also help with a **job search** (see below). |
+| **Interview prep** | Review your resume, write one, practise a mock interview, write and save sample code projects | Real **file tools** through an MCP server (list, search, read and write files in one allowed folder). It can read your resume, save a new one, and save a code project for you. You can also upload a resume or job description. It can also build **job search links** (see below). |
 
 
 ### Troubleshoot agent: checks your real laptop
@@ -96,17 +96,15 @@ Mark called the `checkWifiStatus` tool on the machine the backend runs on, and t
 
 He searched the allowed folder, read the resume with `read_file`, and gave feedback. Then he created a folder and saved the Java file with `write_file`. The "Tools the model called" list is added by the backend, so you can always see what the model really did.
 
-### Job search inside the Interview agent
+### Job links: Naukri and LinkedIn
 
-The Interview agent can find real jobs, match them to your profile and prepare applications, through a separate MCP server (the job agent) that is protected with **OAuth2** (client credentials). In the UI this is the **Jobs** row of the Interview panel: the job sources and whether each is connected, quick buttons, and your **Applications**.
+Press **Job links** in the Interview panel (or just ask). Mark asks for your role and city, then gives you the **Naukri** and **LinkedIn** search pages for them as clickable links. You open a link, sign in on that site and **apply there yourself**.
 
-- **Real listings** come from official job APIs (Arbeitnow and Remotive need no key; Adzuna, with your own free key, covers India). **Naukri has no public API**, so Mark only gives you a Naukri search link to open and sign in to yourself: the agent never asks for a Naukri password, logs in or scrapes.
-- **Matching** is a calculated 0-100 score with matched and missing skills, not a guess.
-- **Nothing is ever sent for you.** Mark prepares a *draft* cover note from your profile. **You** read it and press **Approve** (the AI has no way to), then **Open apply page** takes you to the job's own site where you submit it, and **I applied** records it.
+- It is deliberately link-only. Neither site has a way for another program to submit an application, and logging in for you would break their terms and could get your account blocked, so Mark never logs in, scrapes or sends anything.
+- Mark never invents job listings: the links are built by a small tool (`jobSearchLinks`) from your role and city, and the reply lists the tool that was called.
+- If you want a cover letter, Mark reads your resume with the file tools and writes one in the chat for you to copy.
 
-The hosted demo has a made-up draft so you can try the Approve and apply buttons:
-
-![jobs: find jobs, approve a draft, then apply on the job site](docs/media/24-jobs.gif)
+![job links: Naukri and LinkedIn search pages](docs/media/24-job-links.gif)
 
 ### How the backend fits together
 
@@ -119,7 +117,7 @@ auth-service  ----- signs JWTs ----->  help-desk (Spring Boot + Spring AI)
   login/register)  published as JWKS)        |-- conversation memory (per user)
                                              |-- MCP client --> laptop-troubleshooting-mcp   (Troubleshoot)
                                              |-- MCP client --> java-mcp-filesystem-server   (Interview prep)
-                                             '-- MCP client --> job-application-agent       (Interview prep, OAuth2)
+                                             '-- job link tool (Naukri and LinkedIn search pages, Interview prep)
 ```
 
 - **Spring Boot 4, Java 21, Spring AI 2** with local models through **Ollama**; the models run on your own machine.
