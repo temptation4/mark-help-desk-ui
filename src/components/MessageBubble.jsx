@@ -24,6 +24,30 @@ function StepLine({ line }) {
   });
 }
 
+// Links in a message are clickable: both [text](https://...) and a bare https://... address. Only http(s) links are made, and they open
+// in a new tab (a chat message must never be able to run a javascript: link).
+const LINK = /(\[[^\]]+\]\(https?:\/\/[^)\s]+\)|https?:\/\/[^\s<>"')\]]+)/;
+
+function Linkified({ text }) {
+  return text.split(LINK).map((part, i) => {
+    if (i % 2 === 0) return part ? <React.Fragment key={i}>{part}</React.Fragment> : null;
+    let label = part, url = part, after = "";
+    const markdown = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);
+    if (markdown) {
+      [, label, url] = markdown;
+    } else {
+      const trailing = part.match(/[.,;:!?]+$/); // a full stop after the link is not part of it
+      if (trailing) { after = trailing[0]; url = label = part.slice(0, -after.length); }
+    }
+    return (
+      <React.Fragment key={i}>
+        <a href={url} target="_blank" rel="noopener noreferrer" className="break-all font-medium text-sky-600 underline underline-offset-2 hover:text-sky-500">{label}</a>
+        {after}
+      </React.Fragment>
+    );
+  });
+}
+
 // Text with code blocks: the parts between ``` fences are shown as code, the rest as normal text. A block that is
 // still being typed (no closing fence yet) already shows as code.
 function MessageText({ text }) {
@@ -43,7 +67,7 @@ function MessageText({ text }) {
   }
   return text.split(/(```[\s\S]*?(?:```|$))/).map((part, i) => {
     if (i % 2 === 0) {
-      return part ? <span key={i} className="whitespace-pre-wrap break-words">{part}</span> : null;
+      return part ? <span key={i} className="whitespace-pre-wrap break-words"><Linkified text={part} /></span> : null;
     }
     const code = part.replace(/^```[^\n]*\n?/, "").replace(/```$/, "").replace(/\n$/, "");
     return (
