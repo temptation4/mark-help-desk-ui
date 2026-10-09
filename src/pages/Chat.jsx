@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Search, MoreVertical, Send, Plus, LogOut, Mic, Square, Headphones, X, MessageCircle, Wrench, GraduationCap, Bot, Check, ChevronUp, Workflow,
+  Search, MoreVertical, Send, Plus, LogOut, Mic, Square, Headphones, X, MessageCircle, Wrench, GraduationCap, Bot, Check, ChevronUp,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -38,10 +38,6 @@ const AGENTS = [
   {
     id: "interview", label: "Interview prep", hint: "Practise mock interviews and get feedback on your answers",
     placeholder: "Tell me the role you are preparing for...", Icon: GraduationCap,
-  },
-  {
-    id: "agentic", label: "Agentic helpdesk", hint: "Plans and acts step by step: Jev decides, tools act, you see every step",
-    placeholder: "Describe a problem, or ask me to find jobs...", Icon: Workflow,
   },
 ];
 
