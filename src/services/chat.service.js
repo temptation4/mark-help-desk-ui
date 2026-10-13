@@ -1,4 +1,5 @@
 import { authHeaders, handleUnauthorized } from "../lib/auth";
+import { reportBackendUnreachable } from "../lib/useServerUp";
 import { DEMO, streamDemoReply } from "../lib/demo";
 
 /**
@@ -21,16 +22,23 @@ import { DEMO, streamDemoReply } from "../lib/demo";
 export async function streamMessagesToServer(message, conversationId, onChunk, agent = "chat") {
   if (DEMO) return streamDemoReply(message, agent, onChunk); // hosted demo: canned answers, no backend
 
-  const response = await fetch("/api/v1/helpdesk/stream", {
-    method: "POST",
-    headers: {
-      "Content-Type": "text/plain",
-      ConversationId: conversationId,
-      Agent: agent,
-      ...authHeaders(), // the login token; without it the backend answers 401
-    },
-    body: message,
-  });
+  let response;
+  try {
+    response = await fetch("/api/v1/helpdesk/stream", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+        ConversationId: conversationId,
+        Agent: agent,
+        ...authHeaders(), // the login token; without it the backend answers 401
+      },
+      body: message,
+    });
+  } catch (error) { // the server cannot be reached at all
+    reportBackendUnreachable();
+    throw error;
+  }
+  if ([502, 503, 504].includes(response.status)) reportBackendUnreachable(); // what the dev proxy answers when the server is down
 
   // Token missing or expired: log in again.
   if (response.status === 401) {
