@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { FileSearch, FilePlus2, FolderGit2, Briefcase, Upload } from "lucide-react";
+import { FileSearch, FilePlus2, FolderGit2, Briefcase, Gauge, Upload } from "lucide-react";
 import { Button } from "./ui/button";
 import { uploadInterviewFile } from "../services/interview.service";
 
@@ -9,6 +9,8 @@ const FILE_ACTIONS = [
   { label: "Check my resume", message: "Check my resume", Icon: FileSearch },
   { label: "Create my resume", message: "Create my resume from my projects", Icon: FilePlus2 },
   { label: "My projects", message: "What projects do I have?", Icon: FolderGit2 },
+  // Jev (a hosted decision API, through the jev-mcp-server) scores your uploaded resume against your uploaded job description
+  { label: "Match resume to job", message: "How well does my resume match my job description? Score it with Jev.", Icon: Gauge },
   // Mark builds the Naukri and LinkedIn search pages; you open one and apply on the site yourself
   { label: "Job links", message: "Give me Naukri and LinkedIn job search links. Ask me for the role and city if you do not know them.", Icon: Briefcase },
 ];

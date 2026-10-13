@@ -50,6 +50,10 @@ function demoAnswer(message, agent) {
     const match = CHAT_REPLIES.find(([pattern]) => pattern.test(message));
     if (match) return match[1];
   }
+  if (agent === "interview" && /\b(match|jev)\b/i.test(message)) {
+    return "Demo mode: in the real app I would read your uploaded resume and job description and ask Jev, a hosted decision API, to score the match. " +
+      "For example: Jev match 87% (java_backend). I would quote that score exactly, then explain your strengths and gaps myself. Here nothing is scored.";
+  }
   if (agent === "interview" && /\b(job links?|naukri|linkedin)\b/i.test(message)) {
     return "Demo mode: in the real app I would ask for your role and city, then give you the matching search pages. For example, for a Java developer:\n\n" +
       "Naukri: https://www.naukri.com/java-developer-jobs\nLinkedIn: https://www.linkedin.com/jobs/search/?keywords=Java+developer\n\n" +
