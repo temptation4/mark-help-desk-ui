@@ -26,3 +26,23 @@ export async function uploadInterviewFile(file, kind) {
   }
   return body;
 }
+
+/**
+ * POST /api/v1/jev/check - asks the backend to call Jev (through the Jev MCP server) with a fixed sample problem and no model in between.
+ * Resolves with {ok: true, sample, category, urgency, suggestedPriority, tookMs}; throws an Error whose message says what is wrong
+ * (the Jev server is not running, there is no API key, Jev did not answer).
+ */
+export async function checkJev() {
+  if (DEMO) return { ok: true, sample: "The whole office has no internet", category: "network", urgency: 0.9, suggestedPriority: "URGENT", tookMs: 0, demo: true };
+
+  const response = await fetch("/api/v1/jev/check", { method: "POST", headers: authHeaders() });
+  if (response.status === 401) {
+    handleUnauthorized();
+    throw new Error("Please log in again.");
+  }
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body.error ?? `The check failed (status ${response.status}).`);
+  }
+  return body;
+}

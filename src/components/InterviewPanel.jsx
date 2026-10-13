@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { FileSearch, FilePlus2, FolderGit2, Briefcase, Gauge, Upload } from "lucide-react";
+import { FileSearch, FilePlus2, FolderGit2, Briefcase, Gauge, Upload, Activity } from "lucide-react";
 import { Button } from "./ui/button";
-import { uploadInterviewFile } from "../services/interview.service";
+import { checkJev, uploadInterviewFile } from "../services/interview.service";
 
 // The buttons only type a message for you: the interview agent does the work with the file tools of the MCP file server.
 const TOPICS = ["Java", "Spring Boot", "Kafka", "System design", "Behavioural"];
@@ -33,6 +33,20 @@ function InterviewPanel({ onSend, busy }) {
 
   // The file was chosen: save it, then let Mark look at it straight away (a resume is reviewed, a job description is compared
   // with the resume; another file can be asked about by name).
+  // "Test Jev": the backend calls Jev through the MCP server with a fixed sample, with no model, and the answer is shown on the status line
+  async function handleJevCheck() {
+    setUpload({ state: "uploading", text: "Asking Jev..." });
+    try {
+      const jev = await checkJev();
+      setUpload({
+        state: "done",
+        text: `Jev works${jev.demo ? " (demo)" : ""}: "${jev.sample}" is ${jev.category}, urgency ${jev.urgency}, priority ${jev.suggestedPriority} (${jev.tookMs} ms).`,
+      });
+    } catch (error) {
+      setUpload({ state: "error", text: `Jev is not working: ${error.message}` });
+    }
+  }
+
   async function handleUpload(kind, file) {
     if (!file) return;
     if (file.size > MAX_UPLOAD_BYTES) {
@@ -69,6 +83,9 @@ function InterviewPanel({ onSend, busy }) {
             <Icon /> {label}
           </Button>
         ))}
+        <Button type="button" variant="outline" size="sm" disabled={busy || upload.state === "uploading"} onClick={handleJevCheck}>
+          <Activity /> Test Jev
+        </Button>
         <span className="text-xs text-muted-foreground">or type: write a Java REST API and save it</span>
       </div>
 
