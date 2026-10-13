@@ -136,7 +136,7 @@ The sign-in page offers **email and password** and **Continue with Google** (OAu
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173
+npm run dev          # http://localhost:5182 (the address registered with Google, so the Google button works)
 ```
 
 The dev server proxies to the backend (defaults: auth service on `:8090`, help-desk on `:8089`). Point it elsewhere with:

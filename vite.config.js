@@ -16,6 +16,10 @@ export default defineConfig({
     },
   },
   server: {
+    // Always 5182: that is the address registered with Google for "Sign in with Google" (Authorized JavaScript origins), so another port would
+    // break the Google button. strictPort makes it fail loudly if 5182 is taken instead of quietly picking another port.
+    port: 5182,
+    strictPort: true,
     // The browser only talks to this dev server (one origin, so no CORS config is needed), which forwards each call to the
     // right microservice: register and login go to the auth-service, everything else to the help-desk backend.
     // (The auth rule must come first: /api/v1/auth is also a prefix match for /api.)
