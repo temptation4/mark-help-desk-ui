@@ -457,13 +457,30 @@ function clipboard() {
 
 /** A travel suitcase with a pull-up handle, wheels and a couple of stickers, for "travel". */
 function suitcase() {
-  const g = new THREE.Group();
-  part(g, new THREE.BoxGeometry(0.36, 0.46, 0.17), paint(0x1fa2a6, 0.4), 0, 0.33); // the case
-  [-0.09, 0.09].forEach((x) => part(g, new THREE.BoxGeometry(0.02, 0.44, 0.18), paint(0x178084, 0.4), x, 0.33)); // the ribs
-  part(g, new THREE.BoxGeometry(0.16, 0.025, 0.03), paint(0x374151, 0.5), 0, 0.59); // the carry handle
-  [-0.12, 0.12].forEach((x) => part(g, new THREE.CylinderGeometry(0.03, 0.03, 0.03, 12), paint(0x1f2937, 0.6), x, 0.08, 0).rotation.z = PI / 2); // the wheels
-  part(g, new THREE.CircleGeometry(0.04, 16), paint(0xffd23f, 0.4), -0.1, 0.24, 0.087); // stickers
-  part(g, new THREE.CircleGeometry(0.03, 16), paint(0xff5fa2, 0.4), 0.08, 0.4, 0.087);
+  const g = new THREE.Group(); // the origin is his grip, on the pull-up handle; the case rolls along beside and a little behind him
+  const handle = paint(0x374151, 0.5);
+  part(g, new THREE.BoxGeometry(0.12, 0.025, 0.03), handle, 0, 0); // the grip he holds
+  [-0.045, 0.045].forEach((x) => { // the two telescopic rods, running down to the case
+    const rod = part(g, new THREE.CylinderGeometry(0.008, 0.008, 0.2, 6), new THREE.MeshStandardMaterial({ color: 0xb0b7c3, metalness: 0.6, roughness: 0.35 }), x + 0.05, -0.1, -0.07);
+    rod.rotation.x = -0.35;
+  });
+  const bag = new THREE.Group(); // the case itself, standing on its wheels
+  bag.position.set(0.1, -0.21, -0.14);
+  g.add(bag);
+  part(bag, new THREE.BoxGeometry(0.3, 0.36, 0.14), paint(0x1fa2a6, 0.4), 0, 0); // the case
+  [-0.075, 0.075].forEach((x) => part(bag, new THREE.BoxGeometry(0.018, 0.35, 0.15), paint(0x178084, 0.4), x, 0)); // the ribs
+  part(bag, new THREE.BoxGeometry(0.1, 0.025, 0.03), handle, 0, 0.19); // the top handle
+  part(bag, new THREE.CircleGeometry(0.035, 16), paint(0xffd23f, 0.4), -0.08, 0.1, 0.072); // stickers
+  part(bag, new THREE.CircleGeometry(0.025, 16), paint(0xff5fa2, 0.4), 0.07, 0.02, 0.072);
+  g.userData.wheels = [-0.1, 0.1].map((x) => { // four little wheels would hide behind it; two are enough, and they spin as he walks
+    const spin = new THREE.Group();
+    spin.position.set(x, -0.2, 0);
+    bag.add(spin);
+    part(spin, new THREE.CylinderGeometry(0.03, 0.03, 0.03, 12), paint(0x1f2937, 0.6)).rotation.z = PI / 2;
+    part(spin, new THREE.BoxGeometry(0.036, 0.008, 0.012), paint(0xd1d5db, 0.5), 0, 0.02, 0); // a spoke, so the turning shows
+    return spin;
+  });
+  g.userData.bag = bag;
   return g;
 }
 
@@ -982,7 +999,7 @@ function partyHat() {
 // how much to enlarge each prop when he holds it (1 = as built)
 const RED_ROSES = [0xc8102e, 0xd62839, 0xe0314f, 0xb3122b, 0xcf1f3a, 0xe63950, 0x9f1239]; // deep reds, for the love and wedding bouquets
 
-const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1, suitcase: 1.7, mountain: 1.6, beach: 1.5 };
+const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1, suitcase: 1.5, mountain: 1.6, beach: 1.5 };
 
 const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
 
@@ -1189,6 +1206,10 @@ export function createProps(scene, arms, glowTexture, head) {
           puff.material.opacity = amount * 0.85 * Math.sin(Math.PI * phase);
         });
       });
+      if (props.suitcase.visible) { // the trolley bag rolls: the wheels turn and the case sways a little behind his steps
+        props.suitcase.userData.wheels.forEach((wheel) => { wheel.rotation.x = -t * 9; });
+        props.suitcase.userData.bag.rotation.z = Math.sin(t * 5) * 0.04;
+      }
       props.cocktail.userData.sparks.forEach((spark, i) => {
         const twinkle = 0.5 + 0.5 * Math.sin(t * 7 + i * 2);
         spark.position.set(Math.cos(t * 1.5 + i * 1.6) * 0.2, 0.62 + (i % 2) * 0.1, Math.sin(t * 1.5 + i * 1.6) * 0.1);

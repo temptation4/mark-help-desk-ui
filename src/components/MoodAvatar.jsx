@@ -45,7 +45,7 @@ const LABEL = {
   congrats: "is congratulating you, presenting a bouquet with a happy bounce and rose petals",
   wedding: "is celebrating a wedding with a bouquet, a crown, floating hearts and rose petals",
   shopping: "is shopping with bags in both hands",
-  travel: "is off on a trip, marching along with a suitcase and a ✈️ on his visor",
+  travel: "is off on a trip, pulling a rolling trolley bag with a ✈️ on his visor",
   mountain: "is admiring the mountains, holding a little snowy range with a 🏔️ on his visor",
   beach: "is at the beach, holding a striped umbrella and swaying to the waves, with a 🏖️ on his visor",
 

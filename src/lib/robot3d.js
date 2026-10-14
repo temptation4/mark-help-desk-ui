@@ -603,16 +603,16 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.props = 1;
     } else if (m === "travel") {
       // off on a trip: a happy march with the suitcase, the other hand waving at the road ahead
-      const step = Math.sin(t * 5);
-      target.bodyY = Math.abs(step) * 0.07;
+      const step = Math.sin(t * 7); // brisk steps, hurrying to the airport
+      target.bodyY = Math.abs(step) * 0.09;
       target.lean = 0.05;
       target.headZ = Math.sin(t * 2.5) * 0.08;
       target.armRx = -0.35;
       target.armRz = 0.3;
       target.armLx = -1.2 + Math.sin(t * 6) * 0.3;
       target.armLz = -0.45;
-      target.legLx = step * 0.4;
-      target.legRx = -step * 0.4;
+      target.legLx = step * 0.6;
+      target.legRx = -step * 0.6;
       target.stars = 0.5;
       target.props = 1;
     } else if (m === "mountain") {

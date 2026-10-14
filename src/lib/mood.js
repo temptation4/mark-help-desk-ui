@@ -57,7 +57,8 @@ const BIRTHDAY = /\b(birthday|b'?day|bday|anniversary|cakes?|many happy returns)
 const CONGRATS = /\bcongrat\w*\b/i; // a bouquet
 const PARTY = /\b(celebrat\w*|balloons?|wish you)\b|(?<!third[ -])\bparty\b/i; // a cocktail, a cold drink, fireworks and balloons
 const SHOPPING = /\b(shopping|shopped|mall|groceries|grocery|supermarket|shopping bags?|flipkart|myntra|walmart|big sale|on sale|discounts?|(?:let'?s|going to|gonna|want to|wanna) (?:buy|shop)|i (?:just )?bought)\b/i;
-const TRAVEL = /\b(travel\w*|trips?|vacations?|holidays?|flights?|airports?|passports?|luggage|suitcases?|tourists?|tour|sightseeing|road ?trip|backpacking|abroad|visa)\b/i; // a suitcase and ✈️
+// (no "ticket" or "booking": those are help desk words)
+const TRAVEL = /\b(travel\w*|trips?|vacations?|holidays?|flights?|fly(?:ing)?|flew|airports?|airlines?|airplanes?|aeroplanes?|planes?|boarding|passports?|visas?|luggage|baggage|suitcases?|trolley|bags? packed|pack(?:ed|ing)?(?: my| your| the)? (?:bags?|luggage|stuff)|packing|tour|tours|touring|tourists?|tourism|sightseeing|road ?trip|backpack(?:ing)?|abroad|overseas|journey|voyage|itinerary|destination|hotels?|resorts?|cruises?|jet ?lag|getaway|honeymoon trip|gonna travel|explore the world|wanderlust)\b/i; // a trolley bag and ✈️
 const MOUNTAIN = /\b(mountains?|hiking|hike|trek\w*|himalaya\w*|everest|hill station|hills?|peaks?|snow|skiing|camping|manali|ladakh|alps)\b/i; // a snowy range and 🏔️
 const BEACH = /\b(beach(?:es)?|seaside|seashore|ocean|island|surf\w*|swimming|sunbathing|goa|maldives|bali|shore|tropical|waves)\b/i; // an umbrella and 🏖️
 const FOOD_GESTURES = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea"];
