@@ -5,6 +5,7 @@
 // robot3d.js calls createProps() once, then setMood() / update() every frame.
 
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
 // The gestures that give him something to hold (the food ones all work the same way: lift, bite, chew).
 export const FOODS = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea"];
@@ -457,27 +458,43 @@ function clipboard() {
 
 /** A travel suitcase with a pull-up handle, wheels and a couple of stickers, for "travel". */
 function suitcase() {
-  const g = new THREE.Group(); // the origin is his grip, on the pull-up handle; the case rolls along beside and a little behind him
-  const handle = paint(0x374151, 0.5);
-  part(g, new THREE.BoxGeometry(0.12, 0.025, 0.03), handle, 0, 0); // the grip he holds
-  [-0.045, 0.045].forEach((x) => { // the two telescopic rods, running down to the case
-    const rod = part(g, new THREE.CylinderGeometry(0.008, 0.008, 0.2, 6), new THREE.MeshStandardMaterial({ color: 0xb0b7c3, metalness: 0.6, roughness: 0.35 }), x + 0.05, -0.1, -0.07);
-    rod.rotation.x = -0.35;
-  });
-  const bag = new THREE.Group(); // the case itself, standing on its wheels
-  bag.position.set(0.1, -0.21, -0.14);
+  const g = new THREE.Group(); // the origin is his grip on the pull-up handle; the floor is 1.04 below it, and the case rolls on it beside and behind him
+  const FLOOR = -1.04;
+  const shell = new THREE.MeshPhysicalMaterial({ color: 0x1b9aaa, roughness: 0.35, clearcoat: 0.6, clearcoatRoughness: 0.3 }); // glossy hard shell
+  const trim = paint(0x1f2937, 0.5);
+  const metal = new THREE.MeshStandardMaterial({ color: 0xc3c9d4, metalness: 0.7, roughness: 0.3 });
+  const W = 0.62, H = 0.78, D = 0.27;
+  const bag = new THREE.Group(); // the case, standing on its wheels
+  bag.position.set(0.18, FLOOR + 0.07 + H / 2, -0.4);
   g.add(bag);
-  part(bag, new THREE.BoxGeometry(0.3, 0.36, 0.14), paint(0x1fa2a6, 0.4), 0, 0); // the case
-  [-0.075, 0.075].forEach((x) => part(bag, new THREE.BoxGeometry(0.018, 0.35, 0.15), paint(0x178084, 0.4), x, 0)); // the ribs
-  part(bag, new THREE.BoxGeometry(0.1, 0.025, 0.03), handle, 0, 0.19); // the top handle
-  part(bag, new THREE.CircleGeometry(0.035, 16), paint(0xffd23f, 0.4), -0.08, 0.1, 0.072); // stickers
-  part(bag, new THREE.CircleGeometry(0.025, 16), paint(0xff5fa2, 0.4), 0.07, 0.02, 0.072);
-  g.userData.wheels = [-0.1, 0.1].map((x) => { // four little wheels would hide behind it; two are enough, and they spin as he walks
+  part(bag, new RoundedBoxGeometry(W, H, D, 4, 0.05), shell, 0, 0, 0); // the hard shell
+  [-0.18, -0.06, 0.06, 0.18].forEach((x) => part(bag, new THREE.BoxGeometry(0.022, H * 0.94, 0.012), paint(0x147583, 0.4), x, 0, D / 2 + 0.002)); // the vertical ribs of the front
+  [-1, 1].forEach((sy) => [-1, 1].forEach((sx) => part(bag, new RoundedBoxGeometry(0.1, 0.1, D + 0.02, 2, 0.02), trim, sx * (W / 2 - 0.04), sy * (H / 2 - 0.04), 0))); // the four corner guards
+  part(bag, new RoundedBoxGeometry(0.22, 0.045, 0.06, 2, 0.015), trim, 0, H / 2 + 0.012, 0); // the top carry handle
+  part(bag, new RoundedBoxGeometry(0.045, 0.2, 0.06, 2, 0.015), trim, W / 2 + 0.005, 0, 0); // a side handle
+  part(bag, new THREE.BoxGeometry(0.07, 0.04, 0.014), metal, 0, -H / 2 + 0.1, D / 2 + 0.006); // the lock plate
+  part(bag, new THREE.CircleGeometry(0.05, 20), paint(0xffd23f, 0.4), -0.14, 0.12, D / 2 + 0.008); // stickers: a sun,
+  part(bag, new THREE.CircleGeometry(0.04, 20), paint(0xff5fa2, 0.4), 0.13, 0.02, D / 2 + 0.008); // a heart-ish dot,
+  part(bag, new THREE.CircleGeometry(0.03, 20), paint(0xffffff, 0.4), -0.1, -0.1, D / 2 + 0.008); // and a white one
+  const tag = part(bag, new RoundedBoxGeometry(0.07, 0.11, 0.008, 2, 0.01), paint(0xff7a3d, 0.5), W / 2 - 0.1, H / 2 - 0.1, D / 2 + 0.014); // a luggage tag
+  tag.rotation.z = 0.15;
+  // the telescopic handle: two rods from the top of the case up to the grip in his hand
+  const top = new THREE.Vector3(0.18, FLOOR + 0.07 + H + 0.02, -0.4);
+  [-0.07, 0.07].forEach((dx) => {
+    const from = new THREE.Vector3(top.x + dx, top.y, top.z), to = new THREE.Vector3(dx * 0.7, 0, 0);
+    const len = from.distanceTo(to);
+    const rod = part(g, new THREE.CylinderGeometry(0.012, 0.012, len, 8), metal, (from.x + to.x) / 2, (from.y + to.y) / 2, (from.z + to.z) / 2);
+    rod.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), to.clone().sub(from).normalize());
+  });
+  part(g, new RoundedBoxGeometry(0.2, 0.04, 0.05, 2, 0.015), trim, 0, 0, 0); // the grip he holds
+  g.userData.wheels = [-0.2, 0.2].map((x) => { // two spinner wheels at the bottom; they turn as the case rolls
     const spin = new THREE.Group();
-    spin.position.set(x, -0.2, 0);
+    spin.position.set(x, -H / 2 - 0.035, -D / 2 + 0.04);
     bag.add(spin);
-    part(spin, new THREE.CylinderGeometry(0.03, 0.03, 0.03, 12), paint(0x1f2937, 0.6)).rotation.z = PI / 2;
-    part(spin, new THREE.BoxGeometry(0.036, 0.008, 0.012), paint(0xd1d5db, 0.5), 0, 0.02, 0); // a spoke, so the turning shows
+    part(spin, new THREE.CylinderGeometry(0.045, 0.045, 0.05, 20), paint(0x111827, 0.7)).rotation.z = PI / 2; // the tyre
+    part(spin, new THREE.CylinderGeometry(0.022, 0.022, 0.056, 12), metal).rotation.z = PI / 2; // the hub
+    part(spin, new THREE.BoxGeometry(0.058, 0.012, 0.03), trim, 0, 0.03, 0); // a spoke mark, so the turning shows
+    part(bag, new THREE.BoxGeometry(0.1, 0.03, 0.1), trim, x, -H / 2 - 0.005, -D / 2 + 0.04); // the wheel housing
     return spin;
   });
   g.userData.bag = bag;
@@ -999,7 +1016,7 @@ function partyHat() {
 // how much to enlarge each prop when he holds it (1 = as built)
 const RED_ROSES = [0xc8102e, 0xd62839, 0xe0314f, 0xb3122b, 0xcf1f3a, 0xe63950, 0x9f1239]; // deep reds, for the love and wedding bouquets
 
-const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1, suitcase: 1.5, mountain: 1.6, beach: 1.5 };
+const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1, suitcase: 1, mountain: 1.6, beach: 1.5 };
 
 const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
 

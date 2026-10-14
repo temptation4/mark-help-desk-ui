@@ -604,10 +604,10 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
     } else if (m === "travel") {
       // off on a trip: a happy march with the suitcase, the other hand waving at the road ahead
       const step = Math.sin(t * 7); // brisk steps, hurrying to the airport
-      target.bodyY = Math.abs(step) * 0.09;
+      target.bodyY = Math.abs(step) * 0.025; // only a small bob, so the wheels of the case stay on the floor
       target.lean = 0.05;
       target.headZ = Math.sin(t * 2.5) * 0.08;
-      target.armRx = -0.35;
+      target.armRx = -0.8; // the pulling arm is raised in front, so the grip is high enough for a big case
       target.armRz = 0.3;
       target.armLx = -1.2 + Math.sin(t * 6) * 0.3;
       target.armLz = -0.45;
