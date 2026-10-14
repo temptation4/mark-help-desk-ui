@@ -45,8 +45,12 @@ const LABEL = {
   congrats: "is congratulating you, presenting a bouquet with a happy bounce and rose petals",
   wedding: "is celebrating a wedding with a bouquet, a crown, floating hearts and rose petals",
   shopping: "is shopping with bags in both hands",
+  diwali: "is celebrating Diwali with hands together, diyas and fireworks, with a 🪔 on his visor",
+  newyear: "is cheering the New Year, jumping with both arms up under fireworks, with a 🎆 on his visor",
+  christmas: "is celebrating Christmas in a snowy night with a lit tree, swaying to the jingle bells, with a 🎄 on his visor",
+  holi: "is playing Holi, dancing and throwing clouds of colour with both arms, with a 🎨 on his visor",
   travel: "is off on a trip, pulling a rolling trolley bag with a ✈️ on his visor",
-  mountain: "is admiring the mountains, holding a little snowy range with a 🏔️ on his visor",
+  mountain: "is admiring the mountains, looking out over the view with a 🏔️ on his visor",
   beach: "is at the beach, holding a striped umbrella and swaying to the waves, with a 🏖️ on his visor",
 
   // Food

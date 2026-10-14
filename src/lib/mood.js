@@ -61,6 +61,13 @@ const SHOPPING = /\b(shopping|shopped|mall|groceries|grocery|supermarket|shoppin
 const TRAVEL = /\b(travel\w*|trips?|vacations?|holidays?|flights?|fly(?:ing)?|flew|airports?|airlines?|airplanes?|aeroplanes?|planes?|boarding|passports?|visas?|luggage|baggage|suitcases?|trolley|bags? packed|pack(?:ed|ing)?(?: my| your| the)? (?:bags?|luggage|stuff)|packing|tour|tours|touring|tourists?|tourism|sightseeing|road ?trip|backpack(?:ing)?|abroad|overseas|journey|voyage|itinerary|destination|hotels?|resorts?|cruises?|jet ?lag|getaway|honeymoon trip|gonna travel|explore the world|wanderlust)\b/i; // a trolley bag and ✈️
 const MOUNTAIN = /\b(mountains?|hiking|hike|trek\w*|himalaya\w*|everest|hill station|hills?|peaks?|snow|skiing|camping|manali|ladakh|alps)\b/i; // a snowy range and 🏔️
 const BEACH = /\b(beach(?:es)?|seaside|seashore|ocean|island|surf\w*|swimming|sunbathing|goa|maldives|bali|shore|tropical|waves)\b/i; // an umbrella and 🏖️
+// Festivals: each one has its own emoji on his visor and a full-page theme (see SceneBackdrop). (No plain "colors" or "rang": those are CSS and other words.)
+const DIWALI = /\b(diwali|deepavali|deepawali|dipawali|diyas?|rangoli|firecrackers?|crackers|patakhe|patakha|festival of lights|shubh deepavali|laxmi puja|lakshmi puja)\b/i; // a diya and 🪔
+const NEWYEAR = /\b(new ?year'?s?|happy new year|nye|new year'?s eve|countdown to (?:the )?new year|auld lang syne)\b/i; // fireworks and 🎆
+const CHRISTMAS = /\b(christmas|xmas|x-mas|santa|santa claus|merry christmas|noel|reindeer|snowman|carols?|jingle bells|christmas tree|december 25)\b/i; // a snowy night and 🎄
+const HOLI = /\b(holi|happy holi|gulal|abir|pichkari|rang barse|festival of colou?rs|colou?r powder|colou?rs? festival)\b/i; // clouds of colour and 🎨
+const FESTIVAL_GESTURES = ["diwali", "newyear", "christmas", "holi"];
+const pickFestival = () => FESTIVAL_GESTURES[Math.floor(Math.random() * FESTIVAL_GESTURES.length)];
 const FOOD_GESTURES = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea"];
 const pickFood = () => FOOD_GESTURES[Math.floor(Math.random() * FOOD_GESTURES.length)];
 
@@ -105,6 +112,11 @@ const USER_RULES = [
   { test: /\b(excited|exciting|can'?t wait|cannot wait|so happy|wow+|amazing news|awesome news)\b/i, gesture: "excited" },
   // a real problem beats the fun topics below: "my pizza app is not working" is a problem first
   { test: /\b(not working|doesn'?t work|won'?t (start|work|turn on|open|load)|broken|error|crash\w*|failed|failure|bug)\b/i, gesture: "sad" },
+  { test: DIWALI, gesture: "diwali" },
+  { test: NEWYEAR, gesture: "newyear" },
+  { test: CHRISTMAS, gesture: "christmas" },
+  { test: HOLI, gesture: "holi" },
+  { test: /\b(festivals?|festive|festivities)\b/i, gesture: pickFestival }, // any festival: he picks one
   { test: WEDDING, gesture: "wedding" },
   { test: HEARTBREAK, gesture: "heartbreak" },
   { test: PROMOTION, gesture: "proud" },

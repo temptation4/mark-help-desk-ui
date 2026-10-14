@@ -38,18 +38,19 @@ const BULB = {
   thanks: 0xf472b6,
   hurt: 0x94a3b8, crying: 0x94a3b8, sleepy: 0x94a3b8, angry: 0xef4444, excited: 0xfbbf24, confused: 0xc084fc, scared: 0xfbbf24,
   clapping: 0x4ade80, cheering: 0x4ade80, love: 0xf472b6, namaste: 0xfb923c, birthday: 0xf472b6, party: 0xc084fc, wedding: 0xf472b6, congrats: 0xf472b6, popcorn: 0xfbbf24, heartbreak: 0x94a3b8, working: 0x38bdf8, meeting: 0x38bdf8, shopping: 0xfbbf24, travel: 0x38bdf8, mountain: 0x67e8f9, beach: 0xfbbf24,
+  diwali: 0xfb923c, newyear: 0xfbbf24, christmas: 0xef4444, holi: 0xf472b6,
 };
 for (const food of FOODS) BULB[food] = 0xfb923c; // orange while he eats
 const bulbFor = (mood) => BULB[mood] ?? BULB.neutral;
 
 // Two names are just other names for a mood he already has: he runs on the spot for both.
 const ALIAS = { running: "thinking", walking: "thinking" };
-const VISOR_EMOJI = { popcorn: ["🍿", 6], heartbreak: ["💔", 2], travel: ["✈️", 3], mountain: ["🏔️", 2], beach: ["🏖️", 2] }; // [emoji, bob speed]
+const VISOR_EMOJI = { popcorn: ["🍿", 6], heartbreak: ["💔", 2], travel: ["✈️", 3], mountain: ["🏔️", 2], beach: ["🏖️", 2], diwali: ["🪔", 3], newyear: ["🎆", 4], christmas: ["🎄", 2], holi: ["🎨", 4] }; // [emoji, bob speed]
 const canonical = (mood) => ALIAS[mood] ?? mood;
 
 // Moods whose eyes are drawn as happy "smiling arcs".
-const HAPPY_EYES = ["happy", "dance", "spin", "delighted", "thanks", "namaste", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping", "travel", "mountain", "beach", "proud", "magic", "thumbs_up", ...FOODS];
-const BIG_SMILE = ["happy", "dance", "spin", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping", "travel", "mountain", "beach"]; // open-mouth smile
+const HAPPY_EYES = ["happy", "dance", "spin", "delighted", "thanks", "namaste", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping", "travel", "mountain", "beach", "diwali", "newyear", "christmas", "holi", "proud", "magic", "thumbs_up", ...FOODS];
+const BIG_SMILE = ["happy", "dance", "spin", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping", "travel", "mountain", "beach", "diwali", "newyear", "christmas", "holi"]; // open-mouth smile
 const SPIN_SECONDS = 1.4; // how long the spin gesture takes
 const DANCE_MOVE_SECONDS = 2.4; // each move of the dance routine lasts this long
 const DANCE_SPIN_MOVE = 1; // ...and this move (counting from 0) is a full turn
@@ -615,17 +616,62 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.legRx = -step * 0.6;
       target.stars = 0.5;
       target.props = 1;
+    } else if (m === "diwali") {
+      // Diwali: hands held together in front in a greeting, a slow happy sway and nods, sparkles all round
+      target.bodyY = Math.abs(Math.sin(t * 2.4)) * 0.05;
+      target.headX = Math.sin(t * 2.4) * 0.12;
+      target.headZ = Math.sin(t * 1.2) * 0.1;
+      target.lean = Math.sin(t * 1.2) * 0.05;
+      target.armRx = -1.25;
+      target.armRz = 0.5;
+      target.armLx = -1.25;
+      target.armLz = -0.5;
+      target.stars = 1;
+    } else if (m === "newyear") {
+      // New Year: jumping with both arms thrown up as the fireworks go off
+      const p = (t * 1.3) % 1;
+      const air = 4 * p * (1 - p);
+      target.bodyY = air * 0.5;
+      target.squash = 0.93 + 0.1 * Math.min(1, air * 2.2);
+      target.armLz = -2.6 + Math.sin(t * 9) * 0.15;
+      target.armRz = 2.6 - Math.sin(t * 9) * 0.15;
+      target.headX = -0.18;
+      target.stars = 1;
+    } else if (m === "christmas") {
+      // Christmas: a cosy jingle-bell sway, arms out a little and swinging in time
+      target.bodyY = Math.abs(Math.sin(t * 3)) * 0.05;
+      target.lean = Math.sin(t * 2) * 0.08;
+      target.headZ = Math.sin(t * 2) * 0.12;
+      target.armRx = -0.2 + Math.sin(t * 4) * 0.2;
+      target.armRz = 1.2 + Math.sin(t * 4) * 0.25;
+      target.armLx = -0.2 - Math.sin(t * 4) * 0.2;
+      target.armLz = -1.2 - Math.sin(t * 4) * 0.25;
+      target.legLx = Math.sin(t * 3) * 0.15;
+      target.legRx = -Math.sin(t * 3) * 0.15;
+      target.stars = 0.6;
+    } else if (m === "holi") {
+      // Holi: dancing and throwing colour with both arms, one after the other
+      const beat = Math.sin(t * 8);
+      target.bodyY = Math.abs(Math.sin(t * 4)) * 0.12;
+      target.headZ = Math.sin(t * 4) * 0.15;
+      target.lean = Math.sin(t * 4) * 0.08;
+      target.armRz = 1.9 + beat * 0.8;
+      target.armLz = -1.9 + beat * 0.8;
+      target.armRx = -0.4 + beat * 0.3;
+      target.armLx = -0.4 - beat * 0.3;
+      target.legLx = Math.sin(t * 8) * 0.35;
+      target.legRx = -Math.sin(t * 8) * 0.35;
+      target.stars = 1;
     } else if (m === "mountain") {
-      // looking out over the peaks: the little mountain held up, the other hand shading his eyes, head turning to take in the view
+      // looking out over the peaks: one hand shading his eyes, the other arm out towards the view, head turning to take it all in
       target.headY = Math.sin(t * 1.2) * 0.3;
       target.headX = -0.08;
       target.bodyY = Math.abs(Math.sin(t * 3)) * 0.03;
-      target.armRx = -1.1;
-      target.armRz = 0.3;
+      target.armRx = -0.9;
+      target.armRz = 0.7;
       target.armLx = -1.6;
       target.armLz = -0.2;
       target.stars = 0.3;
-      target.props = 1;
     } else if (m === "beach") {
       // relaxing on the beach: the umbrella in one hand, swaying to the waves, the other hand waving lazily
       target.bodyY = Math.abs(Math.sin(t * 2)) * 0.04;

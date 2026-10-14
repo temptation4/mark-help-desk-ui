@@ -22,6 +22,11 @@ const TRY = 'Try "thank you", "i want pizza", "dance for me", "you are so cute" 
 const CHAT_REPLIES = [
   [/\b(hi|hello|hey|namaste)\b/i, `Hi! I'm Mark. This page is a demo, so my answers are canned, but my reactions are real. ${TRY}`],
   [/\b(thanks|thank you|thx)\b/i, "You're welcome! Did you see the bow? The real app answers with a local AI model."],
+  [/\b(diwali|deepavali|diyas?|rangoli|firecrackers?|crackers|patakhe)\b/i, "Happy Diwali! 🪔 Lights, sweets and fireworks all night. The real app answers with an AI model; here I only have a few canned lines."],
+  [/\b(new ?year'?s?|happy new year|nye)\b/i, "Happy New Year! 🎆 Here's to a great one. The real app answers with an AI model; here I only have a few canned lines."],
+  [/\b(christmas|xmas|santa|reindeer|snowman|carols?)\b/i, "Merry Christmas! 🎄 Snow, lights and jingle bells. The real app answers with an AI model; here I only have a few canned lines."],
+  [/\b(holi|gulal|pichkari|festival of colou?rs)\b/i, "Happy Holi! 🎨 Bura na maano, Holi hai! The real app answers with an AI model; here I only have a few canned lines."],
+  [/\b(festivals?|festive)\b/i, "Festival time! 🎉 Try Diwali, New Year, Christmas or Holi. The real app answers with an AI model; here I only have a few canned lines."],
   [/\b(beach(?:es)?|seaside|ocean|island|goa|maldives|bali)\b/i, "Beach time! 🏖️ I brought an umbrella and a beach ball. The real app answers with an AI model; here I only have a few canned lines."],
   [/\b(mountains?|hiking|trek\w*|himalaya\w*|snow|camping|manali)\b/i, "Mountains! 🏔️ Look at those snowy peaks. The real app answers with an AI model; here I only have a few canned lines."],
   [/\b(travel\w*|trips?|vacations?|holidays?|flights?|fly(?:ing)?|airports?|airlines?|planes?|passports?|visas?|luggage|baggage|suitcases?|trolley|packing|tour|tourists?|sightseeing|journey|hotels?|resorts?|cruises?|abroad|overseas|getaway)\b/i, "Let's go on a trip! ✈️ My trolley bag is packed. The real app answers with an AI model; here I only have a few canned lines."],
