@@ -78,8 +78,8 @@ Mark is the face. Behind the chat there are three **agents**, each a different p
 | Agent | What it is for | What it can use |
 |---|---|---|
 | **Chat** | Friendly conversation and general questions | Nothing but the model |
-| **Troubleshoot** | "My wifi keeps disconnecting", "my laptop is slow" | Ticket tools (look up, create and update support tickets) and 13 **laptop check tools** through an MCP server: Wi-Fi status, connected network, internet, DNS, ping, a full Wi-Fi diagnosis, CPU, memory, disk, uptime and top processes. It runs a check first, tells you what it found, and opens a ticket only if the problem is still there. |
-| **Interview prep** | Review your resume, write one, practise a mock interview, write and save sample code projects | Real **file tools** through an MCP server (list, search, read and write files in one allowed folder). It can read your resume, save a new one, and save a code project for you. You can also upload a resume or job description. It can also build **job search links** (see below). |
+| **Troubleshoot** | "My wifi keeps disconnecting", "my laptop is slow" | Ticket tools (look up, create and update support tickets) and 13 **laptop check tools** through an MCP server: Wi-Fi status, connected network, internet, DNS, ping, a full Wi-Fi diagnosis, CPU, memory, disk, uptime and top processes. It runs a check first, tells you what it found, and opens a ticket only if the problem is still there. It also asks **Jev**, a hosted decision API, to triage the problem (category, urgency, ticket priority) before opening a ticket. |
+| **Interview prep** | Review your resume, write one, practise a mock interview, write and save sample code projects | Real **file tools** through an MCP server (list, search, read and write files in one allowed folder). It can read your resume, save a new one, and save a code project for you. You can also upload a resume or job description. It can also build **job search links** (see below), and **Jev** scores your resume against a job description (the **Match resume to job** button) and each mock-interview answer. |
 
 
 ### Troubleshoot agent: checks your real laptop
@@ -95,6 +95,10 @@ Mark called the `checkWifiStatus` tool on the machine the backend runs on, and t
 | ![interview resume](docs/media/14-interview-resume.gif) | ![interview code](docs/media/15-interview-code.gif) |
 
 He searched the allowed folder, read the resume with `read_file`, and gave feedback. Then he created a folder and saved the Java file with `write_file`. The "Tools the model called" list is added by the backend, so you can always see what the model really did.
+
+### Jev: scores, not guesses
+
+**Jev** is a hosted decision API. The backend reaches it through an MCP server and gives three tools to the agents: how well a resume matches a job description, a score for an interview answer, and the triage of a support problem. The number comes from Jev; the model only explains it. Press **Test Jev** in the Interview panel to check that the whole chain works: the backend calls Jev with a fixed sample (no model involved) and the status line shows the result, or what is missing. Note that the text you send for scoring (a resume, an answer, a problem) goes to the Jev service.
 
 ### Job links: Naukri and LinkedIn
 
@@ -117,6 +121,7 @@ auth-service  ----- signs JWTs ----->  help-desk (Spring Boot + Spring AI)
   login/register)  published as JWKS)        |-- conversation memory (per user)
                                              |-- MCP client --> laptop-troubleshooting-mcp   (Troubleshoot)
                                              |-- MCP client --> java-mcp-filesystem-server   (Interview prep)
+                                             |-- MCP client --> jev-mcp-server              (Jev scores, over HTTPS with an API key)
                                              '-- job link tool (Naukri and LinkedIn search pages, Interview prep)
 ```
 
