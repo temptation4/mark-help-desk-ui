@@ -455,6 +455,122 @@ function clipboard() {
   return g;
 }
 
+/** A travel suitcase with a pull-up handle, wheels and a couple of stickers, for "travel". */
+function suitcase() {
+  const g = new THREE.Group();
+  part(g, new THREE.BoxGeometry(0.36, 0.46, 0.17), paint(0x1fa2a6, 0.4), 0, 0.33); // the case
+  [-0.09, 0.09].forEach((x) => part(g, new THREE.BoxGeometry(0.02, 0.44, 0.18), paint(0x178084, 0.4), x, 0.33)); // the ribs
+  part(g, new THREE.BoxGeometry(0.16, 0.025, 0.03), paint(0x374151, 0.5), 0, 0.59); // the carry handle
+  [-0.12, 0.12].forEach((x) => part(g, new THREE.CylinderGeometry(0.03, 0.03, 0.03, 12), paint(0x1f2937, 0.6), x, 0.08, 0).rotation.z = PI / 2); // the wheels
+  part(g, new THREE.CircleGeometry(0.04, 16), paint(0xffd23f, 0.4), -0.1, 0.24, 0.087); // stickers
+  part(g, new THREE.CircleGeometry(0.03, 16), paint(0xff5fa2, 0.4), 0.08, 0.4, 0.087);
+  return g;
+}
+
+/** A little mountain range with snowy peaks and pine trees, for "mountains". */
+function mountain() {
+  const g = new THREE.Group();
+  part(g, new THREE.CylinderGeometry(0.34, 0.36, 0.05, 20), paint(0x6b8f4e, 0.8), 0, 0.03); // grass base
+  const peaks = [[-0.08, 0.5, 0.2, 0x7a7f8c], [0.14, 0.34, 0.16, 0x8b909c]];
+  peaks.forEach(([x, h, r, color]) => {
+    part(g, new THREE.ConeGeometry(r, h, 6), paint(color, 0.8), x, 0.05 + h / 2);
+    part(g, new THREE.ConeGeometry(r * 0.42, h * 0.32, 6), paint(0xffffff, 0.5), x, 0.05 + h * 0.84); // the snow cap
+  });
+  [[-0.24, 0.1], [0.27, 0.1], [0.2, -0.12]].forEach(([x, z]) => {
+    part(g, new THREE.CylinderGeometry(0.012, 0.012, 0.05, 6), paint(0x5a3a1a), x, 0.08, z);
+    part(g, new THREE.ConeGeometry(0.05, 0.14, 8), paint(0x2e7d3e, 0.7), x, 0.18, z); // a pine
+  });
+  return g;
+}
+
+/** A striped beach umbrella with a beach ball at its foot, for "beaches". */
+function beachUmbrella() {
+  const g = new THREE.Group();
+  part(g, new THREE.CylinderGeometry(0.012, 0.012, 0.78, 8), paint(0xf8fafc, 0.4), 0, 0.39); // the pole
+  const colors = [0xff5252, 0xffffff];
+  for (let i = 0; i < 8; i++) { // eight wedges, alternately red and white
+    const wedge = part(g, new THREE.SphereGeometry(0.34, 6, 8, (i * PI) / 4, PI / 4, 0, PI / 2), new THREE.MeshStandardMaterial({ color: colors[i % 2], roughness: 0.6, side: THREE.DoubleSide }), 0, 0.5);
+    wedge.scale.y = 0.55;
+  }
+  part(g, new THREE.SphereGeometry(0.025, 8, 6), paint(0xffd23f, 0.4), 0, 0.78); // the tip
+  const ball = part(g, new THREE.SphereGeometry(0.075, 16, 12), paint(0xffffff, 0.4), 0.2, 0.075, 0.05);
+  [[0xff5252, 0.05], [0x4ea8ff, -0.05]].forEach(([color, y]) => part(ball, new THREE.TorusGeometry(0.073, 0.012, 6, 16), paint(color, 0.4), 0, y * 0.4, 0).rotation.x = PI / 2);
+  return g;
+}
+
+/**
+ * The view behind him for "mountain" and "beach", painted on a canvas: sky, sun, the scenery, and soft edges that fade into the page.
+ * (A triangle with a white cap is a snowy peak; the beach has a sea, sand, a palm tree and clouds.)
+ */
+function sceneryTexture(kind) {
+  const c = document.createElement("canvas");
+  c.width = c.height = 512;
+  const ctx = c.getContext("2d");
+  const sky = ctx.createLinearGradient(0, 0, 0, 512);
+  sky.addColorStop(0, kind === "beach" ? "#7fd0ff" : "#a9d8ff");
+  sky.addColorStop(1, "#f1f9ff");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, 512, 512);
+  const sun = ctx.createRadialGradient(390, 110, 8, 390, 110, 90);
+  sun.addColorStop(0, "#fff7c2");
+  sun.addColorStop(0.35, "rgba(255,226,120,0.9)");
+  sun.addColorStop(1, "rgba(255,226,120,0)");
+  ctx.fillStyle = sun;
+  ctx.fillRect(280, 0, 232, 230);
+  const cloud = (x, y, s) => { ctx.fillStyle = "rgba(255,255,255,0.9)"; [[0, 0, 30], [28, -8, 26], [54, 2, 22], [-26, 4, 20]].forEach(([dx, dy, r]) => { ctx.beginPath(); ctx.arc(x + dx * s, y + dy * s, r * s, 0, PI * 2); ctx.fill(); }); };
+  cloud(120, 110, 1);
+  cloud(300, 170, 0.7);
+  const peak = (x, base, w, h, body, snow) => {
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.moveTo(x - w / 2, base); ctx.lineTo(x, base - h); ctx.lineTo(x + w / 2, base); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = snow;
+    ctx.beginPath(); // the snow cap, with a jagged lower edge
+    ctx.moveTo(x - w * 0.16, base - h * 0.68); ctx.lineTo(x - w * 0.07, base - h * 0.6); ctx.lineTo(x, base - h * 0.7); ctx.lineTo(x + w * 0.07, base - h * 0.58); ctx.lineTo(x + w * 0.16, base - h * 0.68);
+    ctx.lineTo(x, base - h); ctx.closePath(); ctx.fill();
+  };
+  if (kind === "mountain") {
+    peak(150, 360, 300, 230, "#8da4c4", "#ffffff");
+    peak(340, 360, 340, 270, "#7890b3", "#ffffff");
+    peak(450, 360, 220, 150, "#9fb3cf", "#ffffff");
+    ctx.fillStyle = "#5f8a48"; // the green foothills
+    ctx.beginPath(); ctx.ellipse(110, 440, 230, 90, 0, 0, PI * 2); ctx.fill();
+    ctx.fillStyle = "#6f9a52";
+    ctx.beginPath(); ctx.ellipse(400, 450, 250, 90, 0, 0, PI * 2); ctx.fill();
+    [[60, 400], [110, 380], [165, 410], [350, 405], [410, 385], [470, 410]].forEach(([x, y]) => { // pines
+      ctx.fillStyle = "#2e6b3a";
+      ctx.beginPath(); ctx.moveTo(x - 20, y + 40); ctx.lineTo(x, y - 28); ctx.lineTo(x + 20, y + 40); ctx.closePath(); ctx.fill();
+    });
+  } else {
+    const sea = ctx.createLinearGradient(0, 300, 0, 410);
+    sea.addColorStop(0, "#2fb4d8");
+    sea.addColorStop(1, "#7fdbee");
+    ctx.fillStyle = sea;
+    ctx.fillRect(0, 300, 512, 120);
+    ctx.strokeStyle = "rgba(255,255,255,0.85)"; // wave crests
+    ctx.lineWidth = 4;
+    [[70, 330], [220, 350], [360, 325], [430, 372], [120, 385]].forEach(([x, y]) => { ctx.beginPath(); ctx.moveTo(x - 30, y); ctx.quadraticCurveTo(x - 15, y - 10, x, y); ctx.quadraticCurveTo(x + 15, y + 10, x + 30, y); ctx.stroke(); });
+    ctx.fillStyle = "#f3d9a2"; // the sand
+    ctx.beginPath(); ctx.moveTo(0, 430); ctx.quadraticCurveTo(256, 380, 512, 435); ctx.lineTo(512, 512); ctx.lineTo(0, 512); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#8a5a2b"; // a palm tree: a leaning trunk and fronds
+    ctx.lineWidth = 12;
+    ctx.beginPath(); ctx.moveTo(95, 450); ctx.quadraticCurveTo(120, 350, 170, 270); ctx.stroke();
+    ctx.strokeStyle = "#2f9e4f";
+    ctx.lineWidth = 9;
+    [[-70, 20], [-40, -25], [10, -40], [60, -20], [80, 25]].forEach(([dx, dy]) => { ctx.beginPath(); ctx.moveTo(170, 270); ctx.quadraticCurveTo(170 + dx * 0.6, 270 + dy - 30, 170 + dx, 270 + dy + 20); ctx.stroke(); });
+    ctx.fillStyle = "#7a4a22";
+    [[158, 285], [180, 288]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x, y, 8, 0, PI * 2); ctx.fill(); }); // coconuts
+  }
+  ctx.globalCompositeOperation = "destination-in"; // soft round edges, so it melts into the page
+  const fade = ctx.createRadialGradient(256, 256, 130, 256, 256, 256);
+  fade.addColorStop(0, "rgba(0,0,0,1)");
+  fade.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = fade;
+  ctx.fillRect(0, 0, 512, 512);
+  const texture = new THREE.CanvasTexture(c);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 /** Rounded rectangle path on a canvas. */
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -605,11 +721,11 @@ function deskWithLaptop(glowTexture) {
   [-1, 1].forEach((side) => part(g, new THREE.BoxGeometry(0.09, 0.83, 0.85), darkWood, side * 1.15, 0.415, 0)); // the sides
   part(g, new THREE.BoxGeometry(2.3, 0.55, 0.04), darkWood, 0, 0.55, -0.4); // the back panel
   // the laptop: aluminium base with the keyboard on top, a hinge, and the screen standing at the far (camera) side
-  const aluminium = new THREE.MeshStandardMaterial({ color: 0x9aa4b3, metalness: 0.6, roughness: 0.35 }); // space grey, so the lid stands out against his white body
+  const aluminium = new THREE.MeshStandardMaterial({ color: 0x1c1e23, metalness: 0.05, roughness: 0.7, envMapIntensity: 0.25 }); // dark grey: matte and dark, because the bright studio lights wash a lighter colour out to white
   part(g, new THREE.BoxGeometry(1.0, 0.035, 0.68), aluminium, 0, 0.92, -0.02);
   const keys = part(g, new THREE.PlaneGeometry(0.98, 0.66), new THREE.MeshStandardMaterial({ map: laptopKeyboard(), roughness: 0.5 }), 0, 0.9385, -0.02);
   keys.rotation.x = -PI / 2;
-  part(g, new THREE.CylinderGeometry(0.018, 0.018, 0.9, 12), new THREE.MeshStandardMaterial({ color: 0x9aa3b2, metalness: 0.8, roughness: 0.3 }), 0, 0.945, 0.32).rotation.z = PI / 2; // the hinge
+  part(g, new THREE.CylinderGeometry(0.018, 0.018, 0.9, 12), new THREE.MeshStandardMaterial({ color: 0x2b2e34, metalness: 0.4, roughness: 0.4 }), 0, 0.945, 0.32).rotation.z = PI / 2; // the hinge
   const screen = new THREE.Group();
   screen.position.set(0, 0.945, 0.32);
   screen.rotation.set(-0.2, PI, 0); // the screen faces him (turned round, leaning back a little), so we see the back of the lid
@@ -866,7 +982,7 @@ function partyHat() {
 // how much to enlarge each prop when he holds it (1 = as built)
 const RED_ROSES = [0xc8102e, 0xd62839, 0xe0314f, 0xb3122b, 0xcf1f3a, 0xe63950, 0x9f1239]; // deep reds, for the love and wedding bouquets
 
-const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1 };
+const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1, suitcase: 1.7, mountain: 1.6, beach: 1.5 };
 
 const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
 
@@ -895,6 +1011,9 @@ function holdingFor(mood, props) {
   if (mood === "heartbreak") return [[1, props.brokenheart, true]];
   if (mood === "working") return WORKING; // no hand props: the desk with the laptop stands in front of him
   if (mood === "shopping") return [[0, props.bagL, false], [1, props.bagR, false]];
+  if (mood === "travel") return [[1, props.suitcase, true]]; // a suitcase, packed and ready
+  if (mood === "mountain") return [[1, props.mountain, true]]; // a little snowy range held up in his hand
+  if (mood === "beach") return [[1, props.beach, true]]; // a beach umbrella and ball
   if (FOODS.includes(mood)) return [[DRINKS.includes(mood) ? 0 : 1, props[mood], true]]; // hot drinks are held in his left hand, food in his right
   return null;
 }
@@ -920,8 +1039,11 @@ export function createProps(scene, arms, glowTexture, head) {
   FOODS.forEach((name) => { if (props[name].userData.rim === undefined) props[name].userData.rim = biteHeight(props[name]); }); // where he bites: the top of the food
   props.popcorn = popcorn();
   props.brokenheart = brokenHeart();
+  props.suitcase = suitcase();
+  props.mountain = mountain();
+  props.beach = beachUmbrella();
   Object.entries(props).forEach(([kind, p]) => { p.userData.kind = kind; p.visible = false; });
-  hands[1].add(props.popcorn, props.brokenheart, props.clipboard, props.bouquet, props.bouquetMix, props.cake, props.bagR, ...FOODS.filter((name) => !DRINKS.includes(name)).map((name) => props[name]));
+  hands[1].add(props.suitcase, props.mountain, props.beach, props.popcorn, props.brokenheart, props.clipboard, props.bouquet, props.bouquetMix, props.cake, props.bagR, ...FOODS.filter((name) => !DRINKS.includes(name)).map((name) => props[name]));
   hands[0].add(props.bouquetL, props.cocktail, props.gift, props.bagL, ...DRINKS.map((name) => props[name]));
 
   // the rest of the party: balloons either side of him, and a hat
@@ -991,6 +1113,17 @@ export function createProps(scene, arms, glowTexture, head) {
   desk.visible = false;
   scene.add(desk);
 
+  // the view behind him for mountains and beaches: a painted card that fades in while he plays the gesture
+  const sceneryTextures = { mountain: sceneryTexture("mountain"), beach: sceneryTexture("beach") };
+  const scenery = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 6.4), new THREE.MeshBasicMaterial({ map: sceneryTextures.mountain, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
+  scenery.position.set(0, 2.0, -1.4);
+  scenery.renderOrder = -1;
+  scenery.visible = false;
+  scene.add(scenery);
+  let sceneryKind = null; // "mountain" or "beach" while that gesture is playing
+  let sceneryAmount = 0;
+  let lastT = 0;
+
   let holding = null; // what is in his hands right now; it stays until it has shrunk away
   let current = ""; // the gesture he is playing (the bouquet is shared by the wedding, love and congratulations)
 
@@ -999,10 +1132,18 @@ export function createProps(scene, arms, glowTexture, head) {
     setMood(mood) {
       holding = holdingFor(mood, props) ?? holding;
       current = mood;
+      sceneryKind = mood === "mountain" || mood === "beach" ? mood : null;
+      if (sceneryKind) scenery.material.map = sceneryTextures[sceneryKind];
     },
 
     /** `amount` runs from 0 (nothing in his hands) to 1 (fully shown). */
     update(t, amount, sip = 0) {
+      const dt = Math.min(0.1, Math.max(0, t - lastT));
+      lastT = t;
+      sceneryAmount += ((sceneryKind ? amount : 0) - sceneryAmount) * Math.min(1, dt * 5); // fades in and out smoothly
+      scenery.visible = sceneryAmount > 0.02;
+      scenery.material.opacity = sceneryAmount;
+      scenery.position.x = Math.sin(t * 0.4) * 0.06; // a slow drift
       Object.values(props).forEach((p) => { p.visible = false; });
       confetti.forEach((c) => { c.visible = false; });
       balloons.visible = false;

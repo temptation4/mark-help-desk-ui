@@ -57,6 +57,9 @@ const BIRTHDAY = /\b(birthday|b'?day|bday|anniversary|cakes?|many happy returns)
 const CONGRATS = /\bcongrat\w*\b/i; // a bouquet
 const PARTY = /\b(celebrat\w*|balloons?|wish you)\b|(?<!third[ -])\bparty\b/i; // a cocktail, a cold drink, fireworks and balloons
 const SHOPPING = /\b(shopping|shopped|mall|groceries|grocery|supermarket|shopping bags?|flipkart|myntra|walmart|big sale|on sale|discounts?|(?:let'?s|going to|gonna|want to|wanna) (?:buy|shop)|i (?:just )?bought)\b/i;
+const TRAVEL = /\b(travel\w*|trips?|vacations?|holidays?|flights?|airports?|passports?|luggage|suitcases?|tourists?|tour|sightseeing|road ?trip|backpacking|abroad|visa)\b/i; // a suitcase and ✈️
+const MOUNTAIN = /\b(mountains?|hiking|hike|trek\w*|himalaya\w*|everest|hill station|hills?|peaks?|snow|skiing|camping|manali|ladakh|alps)\b/i; // a snowy range and 🏔️
+const BEACH = /\b(beach(?:es)?|seaside|seashore|ocean|island|surf\w*|swimming|sunbathing|goa|maldives|bali|shore|tropical|waves)\b/i; // an umbrella and 🏖️
 const FOOD_GESTURES = ["pizza", "burger", "icecream", "donut", "coffee", "fries", "noodles", "tteokbokki", "veggies", "fruits", "momos", "sweets", "chocolate", "chips", "tea"];
 const pickFood = () => FOOD_GESTURES[Math.floor(Math.random() * FOOD_GESTURES.length)];
 
@@ -110,6 +113,9 @@ const USER_RULES = [
   { test: CONGRATS, gesture: "congrats" },
   { test: PARTY, gesture: "party" },
   { test: SHOPPING, gesture: "shopping" },
+  { test: BEACH, gesture: "beach" },
+  { test: MOUNTAIN, gesture: "mountain" },
+  { test: TRAVEL, gesture: "travel" },
   { test: /\b(momos?|dumplings?|dim ?sum|gyoza|wontons?|pierogi)\b/i, gesture: "momos" },
   // (no "apple" or "cherry" alone: "my Apple laptop" and "Cherry keyboard" are help desk talk, not fruit)
   { test: /\b(fruits?|apples|bananas?|oranges?|mango(?:es)?|grapes?|strawberr(?:y|ies)|berries|watermelon|pineapple|papaya|kiwi|peach(?:es)?)\b|\b(?:an|red|green|eat(?:ing)?) apple\b/i, gesture: "fruits" },

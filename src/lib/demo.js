@@ -22,6 +22,9 @@ const TRY = 'Try "thank you", "i want pizza", "dance for me", "you are so cute" 
 const CHAT_REPLIES = [
   [/\b(hi|hello|hey|namaste)\b/i, `Hi! I'm Mark. This page is a demo, so my answers are canned, but my reactions are real. ${TRY}`],
   [/\b(thanks|thank you|thx)\b/i, "You're welcome! Did you see the bow? The real app answers with a local AI model."],
+  [/\b(beach(?:es)?|seaside|ocean|island|goa|maldives|bali)\b/i, "Beach time! 🏖️ I brought an umbrella and a beach ball. The real app answers with an AI model; here I only have a few canned lines."],
+  [/\b(mountains?|hiking|trek\w*|himalaya\w*|snow|camping|manali)\b/i, "Mountains! 🏔️ Look at those snowy peaks. The real app answers with an AI model; here I only have a few canned lines."],
+  [/\b(travel\w*|trips?|vacations?|holidays?|flights?|airport|passport|luggage|suitcase)\b/i, "Let's go on a trip! ✈️ My suitcase is packed. The real app answers with an AI model; here I only have a few canned lines."],
   [/\b(movies?|films?|netflix|popcorn|cinema)\b/i, "Movie night! 🍿 I brought the popcorn. The real app answers with an AI model; here I only have a few canned lines."],
   [/\b(i love you|love you|love)\b/i, "Aww, I love you too! 💐 These flowers are for you. The real app answers with an AI model; here I only have a few canned lines."],
   [/\b(break ?up|broke up|divorce|divorced|separation|separated|heartbroken|my ex)\b/i, "Oh no, I'm so sorry. 💔 I'm right here with you. In the real app I answer with an AI model; here I only have a few canned lines."],

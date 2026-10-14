@@ -37,18 +37,19 @@ const BULB = {
   wave: 0x4ade80, spin: 0x4ade80, dance: 0x4ade80, surprised: 0xfbbf24, delighted: 0x4ade80, grabbed: 0xfbbf24, nod: 0x67e8f9,
   thanks: 0xf472b6,
   hurt: 0x94a3b8, crying: 0x94a3b8, sleepy: 0x94a3b8, angry: 0xef4444, excited: 0xfbbf24, confused: 0xc084fc, scared: 0xfbbf24,
-  clapping: 0x4ade80, cheering: 0x4ade80, love: 0xf472b6, namaste: 0xfb923c, birthday: 0xf472b6, party: 0xc084fc, wedding: 0xf472b6, congrats: 0xf472b6, popcorn: 0xfbbf24, heartbreak: 0x94a3b8, working: 0x38bdf8, meeting: 0x38bdf8, shopping: 0xfbbf24,
+  clapping: 0x4ade80, cheering: 0x4ade80, love: 0xf472b6, namaste: 0xfb923c, birthday: 0xf472b6, party: 0xc084fc, wedding: 0xf472b6, congrats: 0xf472b6, popcorn: 0xfbbf24, heartbreak: 0x94a3b8, working: 0x38bdf8, meeting: 0x38bdf8, shopping: 0xfbbf24, travel: 0x38bdf8, mountain: 0x67e8f9, beach: 0xfbbf24,
 };
 for (const food of FOODS) BULB[food] = 0xfb923c; // orange while he eats
 const bulbFor = (mood) => BULB[mood] ?? BULB.neutral;
 
 // Two names are just other names for a mood he already has: he runs on the spot for both.
 const ALIAS = { running: "thinking", walking: "thinking" };
+const VISOR_EMOJI = { popcorn: ["🍿", 6], heartbreak: ["💔", 2], travel: ["✈️", 3], mountain: ["🏔️", 2], beach: ["🏖️", 2] }; // [emoji, bob speed]
 const canonical = (mood) => ALIAS[mood] ?? mood;
 
 // Moods whose eyes are drawn as happy "smiling arcs".
-const HAPPY_EYES = ["happy", "dance", "spin", "delighted", "thanks", "namaste", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping", "proud", "magic", "thumbs_up", ...FOODS];
-const BIG_SMILE = ["happy", "dance", "spin", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping"]; // open-mouth smile
+const HAPPY_EYES = ["happy", "dance", "spin", "delighted", "thanks", "namaste", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping", "travel", "mountain", "beach", "proud", "magic", "thumbs_up", ...FOODS];
+const BIG_SMILE = ["happy", "dance", "spin", "excited", "cheering", "clapping", "birthday", "party", "wedding", "congrats", "popcorn", "shopping", "travel", "mountain", "beach"]; // open-mouth smile
 const SPIN_SECONDS = 1.4; // how long the spin gesture takes
 const DANCE_MOVE_SECONDS = 2.4; // each move of the dance routine lasts this long
 const DANCE_SPIN_MOVE = 1; // ...and this move (counting from 0) is a full turn
@@ -600,6 +601,42 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.armLz = 0.45;
       target.lean = 0.04;
       target.props = 1;
+    } else if (m === "travel") {
+      // off on a trip: a happy march with the suitcase, the other hand waving at the road ahead
+      const step = Math.sin(t * 5);
+      target.bodyY = Math.abs(step) * 0.07;
+      target.lean = 0.05;
+      target.headZ = Math.sin(t * 2.5) * 0.08;
+      target.armRx = -0.35;
+      target.armRz = 0.3;
+      target.armLx = -1.2 + Math.sin(t * 6) * 0.3;
+      target.armLz = -0.45;
+      target.legLx = step * 0.4;
+      target.legRx = -step * 0.4;
+      target.stars = 0.5;
+      target.props = 1;
+    } else if (m === "mountain") {
+      // looking out over the peaks: the little mountain held up, the other hand shading his eyes, head turning to take in the view
+      target.headY = Math.sin(t * 1.2) * 0.3;
+      target.headX = -0.08;
+      target.bodyY = Math.abs(Math.sin(t * 3)) * 0.03;
+      target.armRx = -1.1;
+      target.armRz = 0.3;
+      target.armLx = -1.6;
+      target.armLz = -0.2;
+      target.stars = 0.3;
+      target.props = 1;
+    } else if (m === "beach") {
+      // relaxing on the beach: the umbrella in one hand, swaying to the waves, the other hand waving lazily
+      target.bodyY = Math.abs(Math.sin(t * 2)) * 0.04;
+      target.lean = Math.sin(t * 1.4) * 0.09;
+      target.headZ = Math.sin(t * 1.4) * 0.1;
+      target.armRx = -0.7;
+      target.armRz = 0.35;
+      target.armLx = -0.5;
+      target.armLz = -0.7 + Math.sin(t * 3) * 0.25;
+      target.stars = 0.5;
+      target.props = 1;
     } else if (m === "meeting") {
       // presenting in a meeting: clipboard in one hand, the other hand gesturing, nodding along
       target.headX = Math.sin(t * 2.2) * 0.1;
@@ -1138,11 +1175,12 @@ function drawFace(ctx, mood, t, lookX, lookY, speaking, thanksText = 0, greeting
     ctx.textAlign = "center";
     ctx.fillText(DRINKS.includes(mood) ? "☕" : "😋", w * 0.84, h * 0.24 + Math.sin(t * 6) * h * 0.02); // a hot drink gets a cup instead
   }
-  if (mood === "popcorn" || mood === "heartbreak") {
-    // 🍿 for the popcorn toss, 💔 for a break-up
+  if (VISOR_EMOJI[mood]) {
+    // an emoji bobbing in the corner of the visor: 🍿 for the popcorn toss, 💔 for a break-up, ✈️ 🏔️ 🏖️ for trips
+    const [emoji, speed] = VISOR_EMOJI[mood];
     ctx.font = `${Math.round(w * 0.17)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
     ctx.textAlign = "center";
-    ctx.fillText(mood === "popcorn" ? "🍿" : "💔", w * 0.84, h * 0.24 + Math.sin(t * (mood === "popcorn" ? 6 : 2)) * h * 0.02);
+    ctx.fillText(emoji, w * 0.84, h * 0.24 + Math.sin(t * speed) * h * 0.02);
   }
   if (mood === "confused") {
     // a question mark that bobs above one eye
