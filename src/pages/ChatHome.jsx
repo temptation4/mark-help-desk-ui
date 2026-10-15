@@ -20,7 +20,7 @@ function ChatHome() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col justify-center items-center gap-6">
+    <div className="min-h-dvh w-full overflow-hidden flex flex-col justify-center items-center gap-6 px-4 text-center">
       {/* who is signed in, and a way to sign out */}
       {currentEmail() && (
         <div className="absolute right-4 top-4 flex items-center gap-3">

@@ -352,7 +352,7 @@ function Chat() {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0  mx-auto min-h-screen max-w-7xl grid grid-cols-1 md:grid-cols-[300px_minmax(0,1fr)] border-x ">
+    <div className="fixed inset-x-0 top-0 mx-auto h-dvh max-w-7xl grid grid-cols-1 md:grid-cols-[300px_minmax(0,1fr)] border-x ">
       <div>
         {/* Sidebar */}
 
@@ -423,7 +423,7 @@ function Chat() {
         </aside>
       </div>
       {/* right chat area */}
-      <section className="relative flex h-screen flex-col border-l">
+      <section className="relative flex h-dvh flex-col border-l">
         {/* Chat Area */}
 
         {/* header */}
@@ -440,6 +440,20 @@ function Chat() {
             <span className="mr-2 hidden text-xs text-muted-foreground sm:inline">
               {currentEmail()}
             </span>
+            {/* on a phone the sidebar (with its + button) is hidden, so a new chat is started from here */}
+            <Button
+              onClick={() => {
+                setRobotDismissed(false); // a new chat calls Mark back
+                navigate("/chat/new");
+              }}
+              title="New chat"
+              variant={"outline"}
+              size={"sm"}
+              className={"mr-2 h-8 gap-1 px-2.5 text-xs md:hidden"}
+            >
+              <Plus className={"h-3.5 w-3.5"} />
+              New
+            </Button>
             <Button
               onClick={() => {
                 logout();
@@ -491,7 +505,7 @@ function Chat() {
         </ScrollArea>
 
         {/* composer */}
-        <div className="border-t p-3">
+        <div className="border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {/* Mark was dragged away: say how to bring him back (a button, or the words "come robo") */}
           {robotDismissed && (
             <div className="mx-auto mb-2 flex max-w-3xl items-center justify-between gap-3 rounded-lg bg-muted px-3 py-2 text-xs">

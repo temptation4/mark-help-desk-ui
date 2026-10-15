@@ -141,8 +141,8 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
     camera.position.set(0, 2.2, 10.2); // whole robot, with room above for jumping
     camera.lookAt(0, 2.2, 0);
   } else {
-    camera.position.set(0, 2.55, 5.1); // head and shoulders
-    camera.lookAt(0, 2.5, 0);
+    camera.position.set(0, 2.85, 5.9); // head and shoulders, with room above for the antenna
+    camera.lookAt(0, 2.8, 0);
   }
 
   // ---------------------------------------------------------------- materials
