@@ -516,6 +516,53 @@ function beachUmbrella() {
   return g;
 }
 
+/** How far Mark leans back in the beach lounger, in radians (robot3d.js reclines him by this much; the lounger is built around it). */
+export const LOUNGE_LEAN = -1.0;
+
+/** A striped beach lounger for him to lie back in, with an umbrella leaning over it and a towel on the sand. Built around his reclined pose. */
+function beachLounger() {
+  const g = new THREE.Group();
+  const L = LOUNGE_LEAN;
+  const frame = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.45 });
+  const blue = paint(0x2f9be0, 0.75), white = paint(0xffffff, 0.75);
+  const hipY = 0.74 * Math.cos(L), hipZ = 0.74 * Math.sin(L); // where his hips end up when he leans back (he pivots at his feet)
+  const W = 0.9;
+
+  // the backrest follows his back: a group tilted by the same angle, striped along its length, with a pillow at the top
+  const back = new THREE.Group();
+  const up = new THREE.Vector3(0, Math.cos(L), Math.sin(L));
+  back.position.set(0, hipY, hipZ).addScaledVector(up, 0.95).addScaledVector(new THREE.Vector3(0, Math.sin(L), -Math.cos(L)), 0.62);
+  back.rotation.x = L;
+  g.add(back);
+  const bands = 9, len = 2.0;
+  for (let i = 0; i < bands; i++) part(back, new THREE.BoxGeometry(W, len / bands, 0.07), i % 2 ? white : blue, 0, -len / 2 + (i + 0.5) * (len / bands), 0);
+  [-1, 1].forEach((s) => part(back, new THREE.BoxGeometry(0.05, len + 0.04, 0.1), frame, s * (W / 2 + 0.02), 0, 0)); // the side rails
+  part(back, new RoundedBoxGeometry(W * 0.8, 0.26, 0.2, 3, 0.08), paint(0xffd9a3, 0.8), 0, len / 2 - 0.2, 0.12); // the pillow
+
+  // the seat under his hips and legs, with its rails and legs
+  const seatLen = 1.7, seatZ = -0.1;
+  const bandsSeat = 7;
+  for (let i = 0; i < bandsSeat; i++) part(g, new THREE.BoxGeometry(W, 0.06, seatLen / bandsSeat), i % 2 ? white : blue, 0, 0.17, seatZ - seatLen / 2 + (i + 0.5) * (seatLen / bandsSeat) + seatLen / 2);
+  [-1, 1].forEach((s) => part(g, new THREE.BoxGeometry(0.05, 0.08, seatLen), frame, s * (W / 2 + 0.02), 0.16, seatZ + seatLen / 2));
+  [[-1, -0.78], [1, -0.78], [-1, 0.78], [1, 0.78]].forEach(([s, z]) => part(g, new THREE.CylinderGeometry(0.03, 0.03, 0.16, 8), frame, s * (W / 2 + 0.02), 0.08, seatZ + seatLen / 2 + z));
+  // a strut propping the backrest
+  [-1, 1].forEach((s) => {
+    const from = new THREE.Vector3(s * (W / 2 + 0.02), 0.17, seatZ + seatLen / 2 - 0.75), to = new THREE.Vector3(s * (W / 2 + 0.02), hipY + 0.9, hipZ - 0.72);
+    const strut = part(g, new THREE.CylinderGeometry(0.022, 0.022, from.distanceTo(to), 8), frame, (from.x + to.x) / 2, (from.y + to.y) / 2, (from.z + to.z) / 2);
+    strut.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), to.clone().sub(from).normalize());
+  });
+
+  // the umbrella, planted in the sand and leaning over the chair, and a striped towel beside it
+  const umbrella = beachUmbrella();
+  umbrella.position.set(1.15, 0, -1.55);
+  umbrella.rotation.z = 0.3;
+  umbrella.scale.setScalar(2.5);
+  g.add(umbrella);
+  part(g, new THREE.BoxGeometry(0.7, 0.02, 1.15), paint(0xff7aa8, 0.8), -1.25, 0.012, 0.25);
+  [-0.22, 0, 0.22].forEach((x) => part(g, new THREE.BoxGeometry(0.1, 0.022, 1.15), white, -1.25 + x, 0.013, 0.25));
+  return g;
+}
+
 /** Rounded rectangle path on a canvas. */
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -927,7 +974,7 @@ function partyHat() {
 // how much to enlarge each prop when he holds it (1 = as built)
 const RED_ROSES = [0xc8102e, 0xd62839, 0xe0314f, 0xb3122b, 0xcf1f3a, 0xe63950, 0x9f1239]; // deep reds, for the love and wedding bouquets
 
-const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1, suitcase: 1, beach: 1.5 };
+const SIZE = { cake: 1.9, gift: 1.5, cocktail: 2.0, bouquet: 1.7, bouquetL: 2.3, bouquetMix: 1.7, clipboard: 1.5, brokenheart: 1.15, bagL: 1.15, bagR: 1.15, noodles: 1.8, tteokbokki: 1.9, veggies: 1.4, fruits: 1.4, momos: 1.7, chocolate: 1.35, sweets: 1.3, chips: 1.35, popcorn: 1.9, coffee: 2.4, tea: 2.1, suitcase: 1 };
 
 const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, noodles, tteokbokki, veggies, fruits, momos, sweets, chocolate, chips, tea };
 
@@ -936,6 +983,7 @@ const BUILDERS = { pizza, burger, icecream: iceCream, donut, coffee, fries, nood
  * keepUpright props (food, cake) stay level whichever way the arm swings; bags and balloons just hang from it.
  */
 const WORKING = []; // "holding" for the working gesture: nothing in his hands (see the desk in createProps)
+const LOUNGE = []; // "holding" for the beach gesture: nothing in his hands; he lies back in a lounger (see createProps)
 
 /** How high the top of a prop is above his grip: the point of it that goes to his mouth. (Steam sprites do not count.) */
 function biteHeight(prop) {
@@ -957,7 +1005,7 @@ function holdingFor(mood, props) {
   if (mood === "working") return WORKING; // no hand props: the desk with the laptop stands in front of him
   if (mood === "shopping") return [[0, props.bagL, false], [1, props.bagR, false]];
   if (mood === "travel") return [[1, props.suitcase, true]]; // a suitcase, packed and ready
-  if (mood === "beach") return [[1, props.beach, true]]; // a beach umbrella and ball
+  if (mood === "beach") return LOUNGE; // no hand props: the lounger and umbrella are set up around him
   if (FOODS.includes(mood)) return [[DRINKS.includes(mood) ? 0 : 1, props[mood], true]]; // hot drinks are held in his left hand, food in his right
   return null;
 }
@@ -984,9 +1032,8 @@ export function createProps(scene, arms, glowTexture, head) {
   props.popcorn = popcorn();
   props.brokenheart = brokenHeart();
   props.suitcase = suitcase();
-  props.beach = beachUmbrella();
   Object.entries(props).forEach(([kind, p]) => { p.userData.kind = kind; p.visible = false; });
-  hands[1].add(props.suitcase, props.beach, props.popcorn, props.brokenheart, props.clipboard, props.bouquet, props.bouquetMix, props.cake, props.bagR, ...FOODS.filter((name) => !DRINKS.includes(name)).map((name) => props[name]));
+  hands[1].add(props.suitcase, props.popcorn, props.brokenheart, props.clipboard, props.bouquet, props.bouquetMix, props.cake, props.bagR, ...FOODS.filter((name) => !DRINKS.includes(name)).map((name) => props[name]));
   hands[0].add(props.bouquetL, props.cocktail, props.gift, props.bagL, ...DRINKS.map((name) => props[name]));
 
   // the rest of the party: balloons either side of him, and a hat
@@ -1056,6 +1103,10 @@ export function createProps(scene, arms, glowTexture, head) {
   desk.visible = false;
   scene.add(desk);
 
+  const lounger = beachLounger();
+  lounger.visible = false;
+  scene.add(lounger);
+
   let holding = null; // what is in his hands right now; it stays until it has shrunk away
   let current = ""; // the gesture he is playing (the bouquet is shared by the wedding, love and congratulations)
 
@@ -1074,6 +1125,7 @@ export function createProps(scene, arms, glowTexture, head) {
       hat.visible = false;
       weddingCrown.visible = false;
       desk.visible = false;
+      lounger.visible = false;
       popBits.forEach((b) => { b.visible = false; });
       petals.forEach((p) => { p.visible = false; });
       bursts.forEach((b) => b.sparks.forEach((s) => { s.visible = false; }));
@@ -1153,6 +1205,11 @@ export function createProps(scene, arms, glowTexture, head) {
         desk.visible = true;
         desk.scale.setScalar(Math.max(0.01, amount));
         desk.userData.display.material.map = desk.userData.screens[Math.floor(t * 2) % 2]; // the text cursor blinks
+      }
+
+      if (holding === LOUNGE) { // the lounger and umbrella are set up around him on the sand
+        lounger.visible = true;
+        lounger.scale.setScalar(Math.max(0.01, amount));
       }
 
       if (props.cocktail.visible) { // patakhe: fireworks burst up in the sky and fountains of sparks fizz on the floor

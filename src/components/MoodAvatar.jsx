@@ -51,7 +51,7 @@ const LABEL = {
   holi: "is playing Holi, dancing and throwing clouds of colour with both arms, with a 🎨 on his visor",
   travel: "is off on a trip, pulling a rolling trolley bag with a ✈️ on his visor",
   mountain: "is admiring the mountains, looking out over the view with a 🏔️ on his visor",
-  beach: "is at the beach, holding a striped umbrella and swaying to the waves, with a 🏖️ on his visor",
+  beach: "is at the beach, lying back in a striped lounger under an umbrella and waving lazily, with a 🏖️ on his visor",
 
   // Food
   pizza: "is eating pizza",

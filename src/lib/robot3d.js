@@ -25,7 +25,7 @@
 
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { createProps, FOODS, DRINKS } from "./robotProps";
+import { createProps, FOODS, DRINKS, LOUNGE_LEAN } from "./robotProps";
 
 const FACE_W = 512;
 const FACE_H = 379; // same shape as the visor screen (1.0 x 0.74)
@@ -673,15 +673,17 @@ export function createRobot(container, { full, mood = "neutral", travel = 0, ani
       target.armLz = -0.2;
       target.stars = 0.3;
     } else if (m === "beach") {
-      // relaxing on the beach: the umbrella in one hand, swaying to the waves, the other hand waving lazily
-      target.bodyY = Math.abs(Math.sin(t * 2)) * 0.04;
-      target.lean = Math.sin(t * 1.4) * 0.09;
-      target.headZ = Math.sin(t * 1.4) * 0.1;
-      target.armRx = -0.7;
-      target.armRz = 0.35;
-      target.armLx = -0.5;
-      target.armLz = -0.7 + Math.sin(t * 3) * 0.25;
-      target.stars = 0.5;
+      // lying back in a beach lounger under the umbrella: leaning back, legs stretched out in front, one hand waving lazily
+      target.lean = LOUNGE_LEAN + Math.sin(t * 1.2) * 0.015;
+      target.bodyY = 0;
+      target.legLx = target.legRx = -1.45 - LOUNGE_LEAN; // the lean is added to the legs, so this puts them straight out in front
+      target.headX = 0.7; // his head tips forward again, so he still looks at you
+      target.headZ = Math.sin(t * 0.8) * 0.04;
+      target.armRz = 0.7 + Math.sin(t * 2.2) * 0.3;
+      target.armRx = -0.2;
+      target.armLz = -0.18;
+      target.armLx = 0.1;
+      target.stars = 0.4;
       target.props = 1;
     } else if (m === "meeting") {
       // presenting in a meeting: clipboard in one hand, the other hand gesturing, nodding along
