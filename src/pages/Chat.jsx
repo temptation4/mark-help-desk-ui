@@ -446,11 +446,12 @@ function Chat() {
                 navigate("/login");
               }}
               title="Sign out"
-              variant={"ghost"}
-              size={"icon"}
-              className={"h-8 w-8"}
+              variant={"outline"}
+              size={"sm"}
+              className={"h-8 gap-1.5 px-2.5 text-xs"}
             >
-              <LogOut className={"h-4 w-3"} />
+              <LogOut className={"h-3.5 w-3.5"} />
+              Sign out
             </Button>
             <Button variant={"ghost"} size={"icon"} className={"h-8 w-8"}>
               <MoreVertical className={"h-4 w-3"} />
