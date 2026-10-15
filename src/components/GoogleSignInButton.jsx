@@ -72,6 +72,18 @@ function GoogleSignInButton({ onCredential, onError }) {
     return () => { cancelled = true; };
   }, [clientId]);
 
+  // Still asking the auth service what it supports. On free hosting that service may be asleep and take up to a minute to answer, so show a
+  // greyed-out button with a message instead of an empty gap (which looks like a missing button).
+  if (config === null && !DEMO) {
+    return (
+      <div className="flex flex-col gap-1">
+        <Button type="button" variant="outline" className="w-full" disabled>
+          <GoogleG /> Continue with Google
+        </Button>
+        <p className="text-center text-xs text-muted-foreground">Checking sign-in options... the server may be waking up (up to a minute).</p>
+      </div>
+    );
+  }
   if (config === null) return null;
 
   if (DEMO) {
