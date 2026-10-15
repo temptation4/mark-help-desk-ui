@@ -1,0 +1,26 @@
+# Render Blueprint: the UI as a free static site (the real app, not the demo). The step-by-step guide is DEPLOY.md in the backend repo:
+# https://github.com/temptation4/help-desk-platform
+#
+# The browser only talks to this site. The rewrites below forward the API calls to the two backend services (the same job the
+# dev server's proxy does on your computer), so no CORS settings are needed. Put the real addresses of YOUR two services in the
+# two "destination" lines (Render adds letters to a name that is already taken). The order matters: the first match wins.
+
+services:
+  - type: web
+    name: mark-help-desk-ui
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+    routes:
+      - type: rewrite
+        source: /api/v1/auth/*
+        destination: https://helpdesk-auth.onrender.com/api/v1/auth/*
+      - type: rewrite
+        source: /api/*
+        destination: https://helpdesk-api.onrender.com/api/*
+      - type: rewrite            # any other address (/login, /chat/...) is a page of the app
+        source: /*
+        destination: /index.html
