@@ -6,7 +6,7 @@ A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives 
 
 ## ▶ Try Mark live
 
-### **The real app: [mark-help-desk-ui.onrender.com](https://mark-help-desk-ui.onrender.com)**
+### **The real app: [mark-help-desk-ui.onrender.com](https://mark-help-desk-ui.onrender.com/login)**
 
 Create an account and talk to Mark. The answers come from a real AI model (Google Gemini) through the backend, and the Troubleshoot agent can really open support tickets. It runs on free hosting, so:
 
