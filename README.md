@@ -6,7 +6,15 @@ A React chat app for an AI help desk, with **Mark**: a small 3D robot who lives 
 
 ## ▶ Try Mark live
 
-### **[temptation4.github.io/mark-help-desk-ui](https://temptation4.github.io/mark-help-desk-ui/)**
+### **The real app: [mark-help-desk-ui.onrender.com](https://mark-help-desk-ui.onrender.com)**
+
+Create an account and talk to Mark. The answers come from a real AI model (Google Gemini) through the backend, and the Troubleshoot agent can really open support tickets. It runs on free hosting, so:
+
+- **The first visit after a quiet period takes about a minute** while the services wake up. Wait, and refresh if Mark does not appear.
+- The free AI quota is small. If replies stop working, try again later.
+- The laptop, file and Jev tools and voice need your own computer, so they are off on the hosted version. Chat and tickets work.
+
+### Or the instant demo: **[temptation4.github.io/mark-help-desk-ui](https://temptation4.github.io/mark-help-desk-ui/)**
 
 Sign in with any email and password and say hello. It runs entirely in your browser with no backend, so it is a **demo mode**:
 
