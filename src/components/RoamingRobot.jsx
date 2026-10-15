@@ -396,6 +396,11 @@ function RoamingRobot({
     mood = "delighted";
   }
 
+  // At the beach he lies on the sand, which is the bottom of the scene (just above the message box), never out in the sea.
+  if (mood === "beach" && presence === "here") {
+    position = { x: position.x, y: Math.max(4, window.innerHeight - (size * 1.2 + 20) - 56) };
+  }
+
   // While the user types or talks he looks towards the message box at the bottom of the screen.
   const lookAt = baseMood === "listening" && !hovered
     ? { x: window.innerWidth * 0.55, y: window.innerHeight - 40 }
