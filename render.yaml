@@ -20,7 +20,7 @@ services:
         destination: https://helpdesk-auth.onrender.com/api/v1/auth/*
       - type: rewrite
         source: /api/*
-        destination: https://helpdesk-api.onrender.com/api/*
+        destination: https://helpdesk-api-nn3d.onrender.com/api/*
       - type: rewrite            # any other address (/login, /chat/...) is a page of the app
         source: /*
         destination: /index.html
